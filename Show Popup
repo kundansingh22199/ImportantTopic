@@ -1,0 +1,7 @@
+<script src="sweet_alert/sweetalert-dev.js"></script>
+    <link href="sweet_alert/sweetalert.css" rel="stylesheet" />
+    <script src="sweet_alert/sweetalert.min.js"></script>
+
+
+ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "swal('Yeah!!','USSER STATUS DEACTIVE', 'success')", true);
+ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "swal('Yeah!!','Oops!!', 'Low Balance', 'error')", true);
