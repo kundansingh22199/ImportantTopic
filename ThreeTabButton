@@ -164,3 +164,18 @@
                                 }
                             </script>
                         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+              paneltop.Visible = true;
+              ClientScript.RegisterStartupScript(GetType(), "hwa", "openCity(event, 'Paris');", true);
+              ClientScript.RegisterStartupScript(GetType(), "hwa", "openCity(event, 'London');", true);
