@@ -1,0 +1,42 @@
+<asp:FileUpload ID="FileUpload2" class="form-control" runat="server" />
+<asp:Image ID="ImageSecond" alt="error" runat="server" Height="250px" Width="70%" />
+
+
+string filename = "", filename2 = "", filename3 = "";
+int fileSize2 = 0;
+int minsize = 70 * 1024; int maxsize = 1024 * 1024 * 1024;
+bool status = true;
+
+if (FileUpload2.HasFile)
+{
+     fileSize2 = FileUpload2.PostedFile.ContentLength;
+     if (fileSize2 > minsize & fileSize2 < maxsize)
+     {
+        filename2 = Path.GetFileName(FileUpload2.PostedFile.FileName);
+        FileUpload2.SaveAs(Server.MapPath(FileUpload2.PostedFile.FileName));
+        filename2 = "~/AdminModule/Images/" + filename2;
+        status = checkexetion(FileUpload2);
+     }
+}
+
+        bool checkexetion(FileUpload fileUpload2)
+        {
+            try
+            {
+                bool Status;
+                string FileExt = Path.GetExtension(fileUpload2.FileName);
+                if (FileExt.ToUpper() == "PNG" || FileExt.ToUpper() == "JPG" || FileExt.ToUpper() == "JPEG" || FileExt.ToUpper() == ".JPEG" || FileExt.ToUpper() == ".JPG" || FileExt.ToUpper() == ".PNG")
+                {
+                    Status = true;
+                }
+                else
+                {
+                    Status = false;
+                }
+                return Status;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
