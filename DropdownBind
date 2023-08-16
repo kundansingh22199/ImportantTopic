@@ -1,0 +1,11 @@
+    public void BindUserTypeDDL(int SelectId)
+        {
+            DataTable dt = clsUser.UserTypeDDLMaster(SelectId);
+            ddlUserType.DataSource = dt;
+            ddlUserType.DataTextField = "text";
+            ddlUserType.DataValueField = "value";
+            ddlUserType.DataBind();
+            ListItem selectItem = new ListItem("--Select--", "Selected");
+            selectItem.Selected = true;
+            ddlUserType.Items.Insert(0, selectItem);
+        }
