@@ -1,0 +1,17 @@
+create proc SP_TblContact
+ @Section1image varchar(200),
+ @Section1heading varchar(100),
+ @Section1content varchar(300),
+ @CrateBy Varchar (10),
+ @UpdateBy varchar (10)
+ as 
+ begin 
+ if not exists (select *from TblContact)
+   begin
+     insert into TblContact(Section1image,Section1heading,Section1content,CrateBy,CreateOn)values(@Section1image,@Section1heading,@Section1content,@CrateBy,GETDATE())
+   end
+ else
+   begin
+     update TblContact set Section1image=@Section1image,Section1heading=@Section1heading,Section1content=@Section1content,UpdateBy=@UpdateBy,UpdateOn=getDate()
+   end
+ end 
