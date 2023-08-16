@@ -1,0 +1,20 @@
+            btn_close.Visible = false;
+            btnPrint.Visible = false;
+            Btn_back.Visible = false;
+            StringWriter stringWrite = new StringWriter();
+            HtmlTextWriter htmlWrite = new HtmlTextWriter(stringWrite);
+
+            Page pg = new Page();
+            pg.EnableEventValidation = false;
+            HtmlForm frm = new HtmlForm();
+            pg.EnableEventValidation = false;
+            pg.Controls.Add(frm);
+            frm.Attributes.Add("runat", "server");
+            frm.Controls.Add(divmodel);
+            pg.DesignerInitialize();
+            pg.RenderControl(htmlWrite);
+            string strHTML = stringWrite.ToString();
+            HttpContext.Current.Response.Clear();
+            HttpContext.Current.Response.Write(strHTML);
+            HttpContext.Current.Response.Write("<script>window.print();</script>");
+            HttpContext.Current.Response.End();
