@@ -1,0 +1,20 @@
+           DataTable servicesTable = clsmain.GetServiceData();
+            // Generate list items for the "Services" dropdown
+            foreach (DataRow row in servicesTable.Rows)
+            {
+                string serviceName = row["ServiceName"].ToString();
+                string serviceUrl = row["PageUrl"].ToString();
+
+                HtmlGenericControl div = new HtmlGenericControl("Div");
+                HtmlAnchor a = new HtmlAnchor();
+
+                a.HRef = serviceUrl;
+                a.InnerText = serviceName;
+                a.Attributes["class"] = "dropdown-item";
+
+                div.Controls.Add(a);
+                serviceList.Controls.Add(div);
+            }
+
+
+<div class="dropdown-menu fade-up m-0" style="color: black" id="serviceList" runat="server">
