@@ -1,0 +1,43 @@
+                string token = clsToken.GetToken("UFMwMDEyNTMwYmQ4OGEyYTY0MzM2NDBkNWZhY2Y1MTg1YmFiZDYxMg==", "PS001253");
+                string url = "https://paysprint.in/service-api/api/v1/service/dmt/transact/transact";
+                string body = "{\"mobile\":" + lbltxtmobile.Text.Trim() + ",\"referenceid\":" + refrenceId + ",\"pipe\":\"bank1\",\"pincode\":110027,\"address\":\"NewDelhi\",\"dob\":\"07-12-2001\",\"gst_state\":\"07\",\"bene_id\":" + lblBeniId.Text.Trim() + ",\"txntype\":\"NEFT\",\"amount\":" + txtAmount.Text + "}";
+                var client = new RestClient(url);
+                client.Timeout = -1;
+                var request = new RestRequest(Method.POST);
+                request.AddHeader("Token", token);
+                request.AddHeader("AuthorisedKey", "ZTkxNzJkMGQyNjRkOGMxN2RhMmZhZWZjOWQwMzQxN2M=");
+                request.AddHeader("Content-Type", "application/json");
+                request.AddParameter("application/json", body, ParameterType.RequestBody);
+                IRestResponse response = client.Execute(request);
+                string content = response.Content;
+                JObject jobj = JObject.Parse(content);
+
+                string status = jobj["status"].ToString();
+                string response_code = jobj["response_code"].ToString();
+                string message = jobj["message"].ToString();
+                if (status.ToLower() == "true")
+                {
+                    if (response_code == "1")
+                    {
+                        string ackno = jobj["ackno"].ToString();
+                        string utr = jobj["utr"].ToString();
+                        string txn_status = jobj["txn_status"].ToString();
+                        string benename = jobj["benename"].ToString();
+                        string customercharge = jobj["customercharge"].ToString();
+                        string gst = jobj["gst"].ToString();
+                        string tds = jobj["tds"].ToString();
+                        string netcommission = jobj["netcommission"].ToString();
+                        string remitter = jobj["remitter"].ToString();
+                        string account_number = jobj["account_number"].ToString();
+                        string txn_amount = jobj["txn_amount"].ToString();
+                        string balance = jobj["balance"].ToString();
+                        string remarks = jobj["remarks"].ToString();
+                        string paysprint_share = jobj["paysprint_share"].ToString();
+
+                        Requests = url + body;
+                        Responses = content;
+                    }
+                }
+
+            string IpAddress = Dns.GetHostByName(hostName).AddressList[0].ToString();
+
