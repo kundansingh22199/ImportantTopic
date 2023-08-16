@@ -1,0 +1,16 @@
+
+CREATE proc SP_DebitCreditUserBalance
+@userId varchar(30),
+@balance decimal(18,6),
+@action varchar(50)
+as
+begin
+	if @action='Debit'
+	begin
+		update tbl_user set user_capBalance-=@balance where userId=@userId
+	end
+	if @action='Credit'
+	begin
+		update tbl_user set user_capBalance+=@balance where userId=@userId
+	end
+end
