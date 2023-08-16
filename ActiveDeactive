@@ -1,0 +1,24 @@
+          string userid = Session["userid"].ToString();
+            CheckBox checkbox = sender as CheckBox;
+            GridViewRow gdrow = checkbox.NamingContainer as GridViewRow;
+            int id = Convert.ToInt32(((Label)gdrow.FindControl("lbl_ServiceID")).Text);
+            if (checkbox.Checked)
+            {
+                int st = 1;
+                int result = clsService.ActivateDeactivateService(id, st, userid);
+                if (result > 0)
+                {
+                    Response.Write("<script>alert(Service Activated)</script>");
+                }
+                gdrow.BackColor = Color.Pink;
+            }
+            else
+            {
+                int st = 0;
+                int result = clsService.ActivateDeactivateService(id, st, userid);
+                if (result > 0)
+                {
+                    Response.Write("<script>alert(Service DeActivated)</script>");
+                }
+                gdrow.BackColor = Color.Wheat;
+            }
