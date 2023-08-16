@@ -1,0 +1,14 @@
+public string GetToken(string JWTkey, string Partnerid)
+        {
+            var client = new RestClient("http://generatetoken.webtechsolution.net/api/Authentication/" + JWTkey + "/" + Partnerid);
+            client.Timeout = -1;
+            var request = new RestRequest(Method.GET);
+            var body = @"";
+            request.AddParameter("text/plain", body, ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+            string content = response.Content;
+            JObject jObject = JObject.Parse(content);
+            return jObject["token"].ToString();
+            // return Token;
+        }
+string token = clsToken.GetToken("UFMwMDEyNTMwYmQ4OGEyYTY0MzM2NDBkNWZhY2Y1MTg1YmFiZDYxMg==", "PS001253");
