@@ -1,0 +1,123 @@
+                                <asp:Repeater ID="Repeater1" runat="server" OnItemCommand="Repeater1_ItemCommand" OnItemDataBound="Repeater1_ItemDataBound">
+                                        <HeaderTemplate>
+                                            <table class="table table-striped" style="border: 1px solid; width: 100%; height: 30px">
+                                                <tr>
+                                                    <th>Parent Type</th>
+                                                    <th>User ID</th>
+                                                    <th>User Name</th>
+                                                    <th>Usertype</th>
+                                                    <th>Mobile No</th>
+                                                    <th>User Email</th>
+                                                    <th>Wallet Balance</th>
+                                                    <th>Credit</th>
+                                                    <th>Debit</th>
+                                                    <th>Update</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                        </HeaderTemplate>
+                                        <ItemTemplate>
+                                            <%--<table style="border:1px solid; width:100% ">--%>
+                                            <tr>
+                                                <td>
+                                                    <asp:Label ID="lblParentType" runat="server" Text='<%# Eval("parent_type") %>'></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <asp:LinkButton ID="linkUserId" CommandName="GetByUserId" runat="server" Text='<%# Eval("userId") %>' data-bs-toggle="modal" data-bs-target="#DetailsPopupModel"></asp:LinkButton>
+                                                </td>
+                                                <td>
+                                                    <asp:Label ID="lblUserName" runat="server" Text='<%# Eval("userName") %>'></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <asp:Label ID="lblUserType" runat="server" Text='<%# Eval("user_Type") %>'></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <asp:LinkButton ID="linkMobile" CommandName="GetByMobileNo" runat="server" Text='<%# Eval("user_phone") %>' data-bs-toggle="modal" data-bs-target="#DetailsPopupModel"></asp:LinkButton>
+                                                </td>
+                                                <td>
+                                                    <asp:Label ID="lblEmail" runat="server" Text='<%# Eval("user_email") %>'></asp:Label>
+                                                </td>
+                                                <td>
+                                                    <asp:Label ID="lblWalletBalance" runat="server" Text='<%# Eval("user_capBalance") %>'></asp:Label>
+                                                </td>
+                                                <td>
+
+                                                    <asp:LinkButton ID="linkCreditButton" CommandName="btnCredit" runat="server">
+                                                            <img id="rptUserDetails_Image3" src="img/credit.png" style="height: 40px; width: 40px; text-align: center;" />
+                                                    </asp:LinkButton>
+                                                </td>
+                                                <td>
+                                                    <asp:LinkButton ID="linkDebitButton" CommandName="btnDebit" runat="server">
+                                                         <img id="rptUserDetails_Image4" src="img/debit.png" style="height: 40px; width: 40px;" />
+                                                    </asp:LinkButton>
+                                                </td>
+                                                <td>
+                                                    <asp:LinkButton ID="linkUpdateButton" CommandName="btnUpdate" runat="server">
+                                                            <img id="rptUserDetails_Image1" src="img/update.png" style="height: 35px; width: 40px;" /></a>
+                                                    </asp:LinkButton>
+                                                </td>
+                                                <td>
+                                                    <asp:HiddenField ID="hdnUserStatus" runat="server" Value='<%# Eval("status") %>' />
+                                                    <asp:LinkButton ID="LnkBtnIsActive" runat="server" CommandName="ACTIVE">
+                                                        <i class="fa fa-toggle-on" aria-hidden="true" style="font-size:35px;"></i>
+                                                    </asp:LinkButton>
+                                                    <asp:LinkButton ID="LnkBtnIsDeActive" runat="server" CommandName="DEACTIVE">
+                                                        <i class="fa fa-toggle-off" aria-hidden="true" style="font-size:35px;"></i>
+                                                    </asp:LinkButton>
+                                                </td>
+                                            </tr>
+                                        </ItemTemplate>
+                                        <FooterTemplate>
+                                            </table>
+                                        </FooterTemplate>
+                                    </asp:Repeater>
+
+
+
+
+
+
+        protected void Repeater1_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "GetByUserId")
+            {
+                LinkButton linkUserId = (LinkButton)e.Item.FindControl("linkUserId");
+                string userId = linkUserId.Text;
+            }
+        
+            if (e.CommandName.ToUpper() == "DEACTIVE")
+            {
+                LinkButton linkUserId = (LinkButton)e.Item.FindControl("linkUserId");
+                string userId = linkUserId.Text;
+            }
+        }
+
+
+        protected void Repeater1_ItemDataBound(object sender, RepeaterItemEventArgs e)
+        {
+
+            if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+            {
+                Label lblWalletBalance = (Label)e.Item.FindControl("lblWalletBalance");
+                totalBalance += Convert.ToDecimal(lblWalletBalance.Text);
+                lbltotalbalance.InnerText = totalBalance.ToString("0.00");
+                //Label lbIsActive = (Label)e.Item.FindControl("lblUserstatus");
+                HiddenField hfstatus = (HiddenField)e.Item.FindControl("hdnUserStatus");
+                LinkButton LnkBtnIsActive = (LinkButton)e.Item.FindControl("LnkBtnIsActive");
+                LinkButton LnkBtnIsDeActive = (LinkButton)e.Item.FindControl("LnkBtnIsDeActive");
+                if (hfstatus.Value.ToLower() == "1")
+                {
+                    stActive++;
+                    LnkBtnIsActive.Visible = true;
+                    LnkBtnIsDeActive.Visible = false;
+                }
+                else
+                {
+                    stDeactive++;
+                    LnkBtnIsActive.Visible = false;
+                    LnkBtnIsDeActive.Visible = true;
+                }
+
+            }
+            lbltotalactive.InnerText = stActive.ToString();
+            lbltotaldeactive.InnerText = stDeactive.ToString();
+        }
