@@ -1,0 +1,62 @@
+<!------------------------------------Create Model Popup----------------------------------------------->
+                      <div class="modal fade bd-example-modal-lg" data-keyboard="false" data-backdrop="static" id="CreditModel" tabindex="-1" style="width: 100%; height: auto">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color: lightgray; color: white; font-family: serif">
+                                                <h4 class="modal-title" style="font-family: serif">Credit Balance Page</h4>
+                                                <button class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <div class="modal-body" style="font-family: serif; font-size: 20px">
+                                                <div class="row" style="border: 1px solid;">
+                                                    <div class="col-6">
+                                                        <span>Old Balance : </span>
+                                                    </div>
+                                                    <div class="col-6" style="display: block">
+                                                        <asp:Label ID="lblOldBal" runat="server"></asp:Label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span>User ID : </span>
+                                                    </div>
+                                                    <div class="col-6" style="display: block">
+                                                        <asp:Label ID="lblCreditUserId" runat="server"></asp:Label>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span>Credit Amount : </span>
+                                                    </div>
+                                                    <div class="col-6" style="">
+                                                        <asp:TextBox ID="txtCreditAmount" CssClass="form-control" runat="server"></asp:TextBox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <asp:Button ID="btnCredit" CssClass="btn btn-primary" runat="server" Text="Credit" OnClick="btnCredit_Click" />
+                                                <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+<!---------------------------Script For Show Credit Model-------------------------------------->
+                              <script>
+                                    function ShowCreditModel() {
+                                        debugger;
+                                        $("#CreditModel").modal("show");
+                                        $("#CreditModel").css('background', 'inherit');
+                                    }
+                                </script>
+
+
+<!---------------------------C# Backend For Show Popup Model-------------------------------------->
+
+
+ScriptManager.RegisterStartupScript(this, this.GetType(), "Pop", "ShowCreditModel();", true);
+
+
+
+
+
+
