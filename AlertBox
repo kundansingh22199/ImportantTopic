@@ -1,0 +1,11 @@
+<div class="col-sm-12">
+                                        <div class="alert alert alert-dismissible bg-success" runat="server" visible="false" id="messagebox">
+                                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                            <strong>Success!</strong>Data has been successfully Inserted .
+                                            <span runat="server" id="txtPass"></span>
+                                        </div>
+                                        <div class="alert alert alert-dismissible bg-danger" runat="server" visible="false" id="messageboxerror">
+                                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                            <strong>Error!</strong> something wrong
+                                        </div>
+                                    </div>
