@@ -1,0 +1,26 @@
+                function CalculateFunction() {
+                    debugger
+                    var PurchasePrice = parseFloat(document.getElementById('<%= txtPurchasePrice.ClientID %>').value);
+                    var Discount = parseFloat(document.getElementById('<%= txtDiscount.ClientID %>').value);
+                    var TaxType = document.getElementById('<%= ddlTaxType.ClientID %>');
+                    var selectedOption = TaxType.options[TaxType.selectedIndex];
+                    var Tax = parseFloat(selectedOption.text);
+                    var discountType = document.getElementById('<%= ddlDiscountType.ClientID %>').value;
+                    var taxVal = document.getElementById('<%= ddlTaxType.ClientID %>').value;
+
+                    var C = 0;
+                    var SalesPrice = 0;
+                    if (discountType == '1') {
+                        C = PurchasePrice - ((PurchasePrice * Discount) / 100);
+                        SalesPrice = C + ((C * Tax) / 100)
+                    }
+
+                    else if (discountType == '2') {
+                        C = PurchasePrice - Discount;
+                        SalesPrice = C + ((C * Tax) / 100)
+                    }
+                    else {
+                        C = 0;
+                    }
+                    parseFloat(document.getElementById('<%= txtSalesPrice.ClientID %>').value = SalesPrice);
+                }
