@@ -21,3 +21,19 @@ Alter Table TableName  Add ColumnName DataType
 
 Drop Column in Sql Table
 Alter Table TableName  drop column ColumnName
+
+
+
+------------------------------------------------------------------
+delete multiple table data  procedure
+------------------------------------------------------------------
+
+create proc SP_DeleteStockProductAndImageByProductCode
+@Id varchar(100)
+As
+Begin
+declare @ProductCode varchar(100)=(select ProductCode from TblProductMaster where Id=@Id )
+	Delete From TblProductMaster Where Id=@Id
+	Delete From TblImageMaster Where ProductId=@Id
+	Delete From TblStockMaster Where ProductCode=@ProductCode
+End
