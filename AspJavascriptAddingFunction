@@ -1,0 +1,15 @@
+                function myFunction() {
+                    debugger
+                    var A = parseFloat(document.getElementById('<%= txtCgst.ClientID %>').value);
+                    var B = parseFloat(document.getElementById('<%= txtSgst.ClientID %>').value);
+                    if (!isNaN(A) && isNaN(B)) {
+                        document.getElementById('<%= txtIgst.ClientID %>').value = A;
+                    }
+                    else if (isNaN(A) && !isNaN(B)) {
+                        document.getElementById('<%= txtIgst.ClientID %>').value = B;
+                    }
+                    else {
+                        var C = A + B;
+                        document.getElementById('<%= txtIgst.ClientID %>').value = C;
+                    }
+                }
