@@ -22,6 +22,8 @@ Alter Table TableName  Add ColumnName DataType
 Drop Column in Sql Table
 Alter Table TableName  drop column ColumnName
 
+Execute Procedure
+exec  ProcedureName ColumnName=Value
 
 
 ------------------------------------------------------------------
