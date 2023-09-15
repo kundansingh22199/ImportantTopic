@@ -1,0 +1,19 @@
+function myFunction2() {
+                    debugger
+                    var productCode, table, tr, columns, values;
+                    productCode = document.getElementById('<%= txtSearchProductCode.ClientID %>').value;
+                    table = document.getElementById("myTable1");
+                    tr = table.getElementsByTagName("tr");
+                    for (var i = 0; i < tr.length; i++) {
+                        columns = tr[i].getElementsByTagName("td")[1];
+                        if (columns) {
+                            values = columns.textContent || columns.innerText;
+                            values = values.toUpperCase();
+                            if (values.indexOf(productCode.toUpperCase()) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }
+                    }
+                }
