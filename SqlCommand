@@ -25,6 +25,8 @@ Alter Table TableName  drop column ColumnName
 Execute Procedure
 exec  ProcedureName ColumnName=Value
 
+Rename Table Column
+ Exec  sp_rename 'TblSizeMaster.Id','SizeId','Column'
 
 ------------------------------------------------------------------
 delete multiple table data  procedure
