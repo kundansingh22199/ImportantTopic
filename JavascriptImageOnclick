@@ -1,0 +1,30 @@
+<div class="container">
+                                                        <div id="images-container">
+                                                            <img src="#" class="image image-1" id="image1" alt="Product Image 1" data-active="active">
+                                                            <img src="#" class="image image-2" id="image2" alt="Product Image 2">
+                                                            <img src="#" class="image image-3" id="image3" alt="Product Image 3">
+                                                            <img src="#" class="image image-4" id="image4" alt="Product Image 4">
+                                                            <img src="#" class="image image-5" id="image5" alt="Product Image 5">
+                                                            <img src="#" class="image image-6" id="image6" alt="Product Image 6">
+                                                        </div>
+                                                        <div id="controls-container" style="background-image: url(dist/img/backend.jpg); height: 55px;">
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image1">1</div>
+                                                            </div>
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image2">2</div>
+                                                            </div>
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image3">3</div>
+                                                            </div>
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image4">4</div>
+                                                            </div>
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image5">5</div>
+                                                            </div>
+                                                            <div class="control">
+                                                                <div class="control-btn" data-image="image6">6</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
