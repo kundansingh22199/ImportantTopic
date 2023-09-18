@@ -1,0 +1,6 @@
+Create proc SP_SearchStock  
+@SearchData varchar(100)  
+As  
+Begin  
+ Select * From TblStockMaster stm inner join TblSizeMaster szm on stm.ProductSize= szm.SizeId inner join TblProductMaster tpm on tpm.ProductCode=stm.ProductCode where stm.ProductCode like @SearchData+'%' or tpm.ProductName like @SearchData+'%' or stm.MrpPrice like @SearchData+'%' or stm.SalesPrice like @SearchData+'%' or stm.Discount like @SearchData+'%' or stm.ProductQuantity like @SearchData+'%'
+End
