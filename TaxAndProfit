@@ -1,0 +1,53 @@
+<script>
+        document.getElementById('<%= txtSalesPrice.ClientID %>').readOnly = true;
+        function CalculateFunction() {
+            debugger
+            var Price = parseFloat(document.getElementById('<%= txtPrice.ClientID %>').value);
+            var DiscountPrice = parseFloat(document.getElementById('<%= txtDiscount.ClientID %>').value);
+            var TaxPrice = parseFloat(document.getElementById('<%= txtTax.ClientID %>').value);
+            var discountType = document.getElementById('<%= ddlDiscountType.ClientID %>').value;
+            var TaxType = document.getElementById('<%= ddlTaxType.ClientID %>').value;
+
+            var T = 0,D=0;
+            if (TaxType == '1') {
+                T = (Price * TaxPrice) / 100;
+                if (discountType == '1') {
+                    D = (Price * DiscountPrice) / 100;
+                }
+                else if (discountType == '2') {
+                    D = DiscountPrice;
+                }
+                else {
+                    D = 0;
+                }
+                var F = Price + T - D;
+                F = F.toFixed(4);
+                parseFloat(document.getElementById('<%= txtSalesPrice.ClientID %>').value = F);
+                var PP = T + Price;
+                PP = PP.toFixed(4)
+                parseFloat(document.getElementById('<%= txtProductPrice.ClientID %>').value = PP);
+            }
+            else if (TaxType == '2') {
+                T = TaxPrice;
+                if (discountType == '1') {
+                    D = (Price * DiscountPrice) / 100;
+                }
+                else if (discountType == '2') {
+                    D = DiscountPrice;
+                }
+                else {
+                    D = 0;
+                }
+                var F = Price + T - D;
+                F = F.toFixed(4);
+                parseFloat(document.getElementById('<%= txtSalesPrice.ClientID %>').value = F);
+                var PP = T + Price;
+                PP = PP.toFixed(4)
+                parseFloat(document.getElementById('<%= txtProductPrice.ClientID %>').value = PP);
+            }
+            else {
+                parseFloat(document.getElementById('<%= txtProductPrice.ClientID %>').value = Price);
+                parseFloat(document.getElementById('<%= txtSalesPrice.ClientID %>').value = Price);
+            }
+        }
+    </script>
