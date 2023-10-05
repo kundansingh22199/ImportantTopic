@@ -4,3 +4,54 @@ As
 Begin  
  Select * From TblStockMaster stm inner join TblSizeMaster szm on stm.ProductSize= szm.SizeId inner join TblProductMaster tpm on tpm.ProductCode=stm.ProductCode where stm.ProductCode like @SearchData+'%' or tpm.ProductName like @SearchData+'%' or stm.MrpPrice like @SearchData+'%' or stm.SalesPrice like @SearchData+'%' or stm.Discount like @SearchData+'%' or stm.ProductQuantity like @SearchData+'%'
 End
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Search Procedure By Action
+ALTER Proc [dbo].[SP_GetOrderList1]  --EXEC [SP_GetOrderList1] 'ALL','','','eLEC','0'
+@Status varchar(50),
+@FromDate varchar(max),
+@ToDate varchar(max),
+@SearchData varchar(100),
+@Action varchar(20)
+aS
+BEGIN
+	DECLARE @query VARCHAR(MAX);
+	DECLARE @query1 VARCHAR(MAX);
+	Set @query='select * from TblOrderMaster odm inner join TblStockMaster tsm on odm.StockId=tsm.Id inner join TblProductMaster tpm on tsm.ProductCode=tpm.ProductCode inner join TblCatogeryMaster tcm on tpm.Catogery=tcm.Id inner join TblSubCatogeryMaster tscm on tpm.SubCatogery=tscm.Id inner join TblSizeMaster tsz on tsm.ProductSize= tsz.SizeId where 1=1 '
+	Set @query1=' order by odm.OrderDate desc'
+	IF(@Action!='0' and @SearchData!='')
+	begin
+		if(@Action='ByCatogery')
+		begin
+			Set @query=@query+'and tcm.CatogeryName like ''%'+@SearchData +'%'''
+		End
+		else if(@Action='BySubCatogery')
+		begin
+			Set @query=@query+'and tscm.SubCatogeryName like ''%'+@SearchData +'%'''
+		End
+		else if(@Action='ByBrand')
+		begin
+			Set @query=@query+'and tsm.S_Brandname like ''%'+@SearchData +'%'''
+		End
+		else if(@Action='ByProductName')
+		begin
+			Set @query=@query+'and tpm.ProductName like ''%'+@SearchData +'%'''
+		End
+		else if(@Action='ByProductCode')
+		begin
+			Set @query=@query+'and tpm.ProductCode like ''%'+@SearchData +'%'''
+		End
+		else
+		Begin
+			Set @query=@query+@query1
+		End
+	end
+	IF (@Status!='')
+		BEGIN
+		SET @query=@query+'and  odm.Status='''+@Status+''''
+		END
+		Set @query=@query+@query1
+	EXEC(@query)
+END
