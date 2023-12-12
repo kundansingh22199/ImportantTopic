@@ -1,0 +1,1326 @@
+USE MVCDemo_DB
+GO
+/****** Object:  Table [dbo].[TblcityMaster]    Script Date: 12/12/2023 3:21:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TblcityMaster](
+	[city_id] [int] NULL,
+	[city_name] [varchar](40) NULL,
+	[c_id] [int] NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[TblstateMaster]    Script Date: 12/12/2023 3:21:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TblstateMaster](
+	[state_id] [int] NULL,
+	[state_name] [varchar](50) NULL
+) ON [PRIMARY]
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (1, N'North and Middle Andaman', 32)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (2, N'South Andaman', 32)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (3, N'Nicobar', 32)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (4, N'Adilabad', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (5, N'Anantapur', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (6, N'Chittoor', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (7, N'East Godavari', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (8, N'Guntur', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (9, N'Hyderabad', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (10, N'Kadapa', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (11, N'Karimnagar', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (12, N'Khammam', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (13, N'Krishna', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (14, N'Kurnool', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (15, N'Mahbubnagar', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (16, N'Medak', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (17, N'Nalgonda', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (18, N'Nellore', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (19, N'Nizamabad', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (20, N'Prakasam', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (21, N'Rangareddi', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (22, N'Srikakulam', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (23, N'Vishakhapatnam', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (24, N'Vizianagaram', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (25, N'Warangal', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (26, N'West Godavari', 1)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (27, N'Anjaw', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (28, N'Changlang', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (29, N'East Kameng', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (30, N'Lohit', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (31, N'Lower Subansiri', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (32, N'Papum Pare', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (33, N'Tirap', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (34, N'Dibang Valley', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (35, N'Upper Subansiri', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (36, N'West Kameng', 3)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (37, N'Barpeta', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (38, N'Bongaigaon', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (39, N'Cachar', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (40, N'Darrang', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (41, N'Dhemaji', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (42, N'Dhubri', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (43, N'Dibrugarh', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (44, N'Goalpara', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (45, N'Golaghat', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (46, N'Hailakandi', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (47, N'Jorhat', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (48, N'Karbi Anglong', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (49, N'Karimganj', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (50, N'Kokrajhar', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (51, N'Lakhimpur', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (52, N'Marigaon', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (53, N'Nagaon', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (54, N'Nalbari', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (55, N'North Cachar Hills', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (56, N'Sibsagar', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (57, N'Sonitpur', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (58, N'Tinsukia', 2)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (59, N'Araria', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (60, N'Aurangabad', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (61, N'Banka', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (62, N'Begusarai', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (63, N'Bhagalpur', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (64, N'Bhojpur', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (65, N'Buxar', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (66, N'Darbhanga', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (67, N'Purba Champaran', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (68, N'Gaya', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (69, N'Gopalganj', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (70, N'Jamui', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (71, N'Jehanabad', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (72, N'Khagaria', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (73, N'Kishanganj', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (74, N'Kaimur', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (75, N'Katihar', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (76, N'Lakhisarai', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (77, N'Madhubani', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (78, N'Munger', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (79, N'Madhepura', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (80, N'Muzaffarpur', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (81, N'Nalanda', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (82, N'Nawada', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (83, N'Patna', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (84, N'Purnia', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (85, N'Rohtas', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (86, N'Saharsa', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (87, N'Samastipur', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (88, N'Sheohar', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (89, N'Sheikhpura', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (90, N'Saran', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (91, N'Sitamarhi', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (92, N'Supaul', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (93, N'Siwan', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (94, N'Vaishali', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (95, N'Pashchim Champaran', 4)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (96, N'Bastar', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (97, N'Bilaspur', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (98, N'Dantewada', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (99, N'Dhamtari', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (100, N'Durg', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (101, N'Jashpur', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (102, N'Janjgir-Champa', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (103, N'Korba', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (104, N'Koriya', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (105, N'Kanker', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (106, N'Kawardha', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (107, N'Mahasamund', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (108, N'Raigarh', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (109, N'Raipur', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (110, N'Surguja', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (111, N'Diu', 29)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (112, N'Daman', 29)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (113, N'Rajnandgaon', 36)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (114, N'Central Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (115, N'East Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (116, N'New Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (117, N'North Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (118, N'North East Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (119, N'North West Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (120, N'South Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (121, N'South West Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (122, N'West Delhi', 25)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (123, N'North Goa', 26)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (124, N'South Goa', 26)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (125, N'Ahmedabad', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (126, N'Amreli District', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (127, N'Anand', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (128, N'Banaskantha', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (129, N'Bharuch', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (130, N'Bhavnagar', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (131, N'Dahod', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (132, N'The Dangs', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (133, N'Gandhinagar', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (134, N'Jamnagar', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (135, N'Junagadh', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (136, N'Kutch', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (137, N'Kheda', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (138, N'Mehsana', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (139, N'Narmada', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (140, N'Navsari', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (141, N'Patan', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (142, N'Panchmahal', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (143, N'Porbandar', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (144, N'Rajkot', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (145, N'Sabarkantha', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (146, N'Surendranagar', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (147, N'Surat', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (148, N'Vadodara', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (149, N'Valsad', 5)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (150, N'Ambala', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (151, N'Bhiwani', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (152, N'Faridabad', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (153, N'Fatehabad', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (154, N'Gurgaon', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (155, N'Hissar', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (156, N'Jhajjar', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (157, N'Jind', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (158, N'Karnal', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (159, N'Kaithal', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (160, N'Kurukshetra', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (161, N'Mahendragarh', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (162, N'Mewat', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (163, N'Panchkula', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (164, N'Panipat', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (165, N'Rewari', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (166, N'Rohtak', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (167, N'Sirsa', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (168, N'Sonepat', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (169, N'Yamuna Nagar', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (170, N'Palwal', 6)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (171, N'Bilaspur', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (172, N'Chamba', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (173, N'Hamirpur', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (174, N'Kangra', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (175, N'Kinnaur', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (176, N'Kulu', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (177, N'Lahaul and Spiti', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (178, N'Mandi', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (179, N'Shimla', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (180, N'Sirmaur', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (181, N'Solan', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (182, N'Una', 7)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (183, N'Anantnag', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (184, N'Badgam', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (185, N'Bandipore', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (186, N'Baramula', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (187, N'Doda', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (188, N'Jammu', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (189, N'Kargil', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (190, N'Kathua', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (191, N'Kupwara', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (192, N'Leh', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (193, N'Poonch', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (194, N'Pulwama', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (195, N'Rajauri', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (196, N'Srinagar', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (197, N'Samba', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (198, N'Udhampur', 8)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (199, N'Bokaro', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (200, N'Chatra', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (201, N'Deoghar', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (202, N'Dhanbad', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (203, N'Dumka', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (204, N'Purba Singhbhum', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (205, N'Garhwa', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (206, N'Giridih', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (207, N'Godda', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (208, N'Gumla', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (209, N'Hazaribagh', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (210, N'Koderma', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (211, N'Lohardaga', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (212, N'Pakur', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (213, N'Palamu', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (214, N'Ranchi', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (215, N'Sahibganj', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (216, N'Seraikela and Kharsawan', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (217, N'Pashchim Singhbhum', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (218, N'Ramgarh', 34)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (219, N'Bidar', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (220, N'Belgaum', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (221, N'Bijapur', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (222, N'Bagalkot', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (223, N'Bellary', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (224, N'Bangalore Rural District', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (225, N'Bangalore Urban District', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (226, N'Chamarajnagar', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (227, N'Chikmagalur', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (228, N'Chitradurga', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (229, N'Davanagere', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (230, N'Dharwad', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (231, N'Dakshina Kannada', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (232, N'Gadag', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (233, N'Gulbarga', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (234, N'Hassan', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (235, N'Haveri District', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (236, N'Kodagu', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (237, N'Kolar', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (238, N'Koppal', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (239, N'Mandya', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (240, N'Mysore', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (241, N'Raichur', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (242, N'Shimoga', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (243, N'Tumkur', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (244, N'Udupi', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (245, N'Uttara Kannada', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (246, N'Ramanagara', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (247, N'Chikballapur', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (248, N'Yadagiri', 9)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (249, N'Alappuzha', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (250, N'Ernakulam', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (251, N'Idukki', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (252, N'Kollam', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (253, N'Kannur', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (254, N'Kasaragod', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (255, N'Kottayam', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (256, N'Kozhikode', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (257, N'Malappuram', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (258, N'Palakkad', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (259, N'Pathanamthitta', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (260, N'Thrissur', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (261, N'Thiruvananthapuram', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (262, N'Wayanad', 10)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (263, N'Alirajpur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (264, N'Anuppur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (265, N'Ashok Nagar', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (266, N'Balaghat', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (267, N'Barwani', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (268, N'Betul', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (269, N'Bhind', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (270, N'Bhopal', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (271, N'Burhanpur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (272, N'Chhatarpur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (273, N'Chhindwara', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (274, N'Damoh', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (275, N'Datia', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (276, N'Dewas', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (277, N'Dhar', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (278, N'Dindori', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (279, N'Guna', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (280, N'Gwalior', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (281, N'Harda', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (282, N'Hoshangabad', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (283, N'Indore', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (284, N'Jabalpur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (285, N'Jhabua', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (286, N'Katni', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (287, N'Khandwa', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (288, N'Khargone', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (289, N'Mandla', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (290, N'Mandsaur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (291, N'Morena', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (292, N'Narsinghpur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (293, N'Neemuch', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (294, N'Panna', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (295, N'Rewa', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (296, N'Rajgarh', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (297, N'Ratlam', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (298, N'Raisen', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (299, N'Sagar', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (300, N'Satna', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (301, N'Sehore', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (302, N'Seoni', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (303, N'Shahdol', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (304, N'Shajapur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (305, N'Sheopur', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (306, N'Shivpuri', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (307, N'Sidhi', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (308, N'Singrauli', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (309, N'Tikamgarh', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (310, N'Ujjain', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (311, N'Umaria', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (312, N'Vidisha', 11)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (313, N'Ahmednagar', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (314, N'Akola', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (315, N'Amrawati', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (316, N'Aurangabad', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (317, N'Bhandara', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (318, N'Beed', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (319, N'Buldhana', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (320, N'Chandrapur', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (321, N'Dhule', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (322, N'Gadchiroli', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (323, N'Gondiya', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (324, N'Hingoli', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (325, N'Jalgaon', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (326, N'Jalna', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (327, N'Kolhapur', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (328, N'Latur', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (329, N'Mumbai City', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (330, N'Mumbai suburban', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (331, N'Nandurbar', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (332, N'Nanded', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (333, N'Nagpur', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (334, N'Nashik', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (335, N'Osmanabad', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (336, N'Parbhani', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (337, N'Pune', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (338, N'Raigad', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (339, N'Ratnagiri', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (340, N'Sindhudurg', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (341, N'Sangli', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (342, N'Solapur', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (343, N'Satara', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (344, N'Thane', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (345, N'Wardha', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (346, N'Washim', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (347, N'Yavatmal', 12)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (348, N'Bishnupur', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (349, N'Churachandpur', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (350, N'Chandel', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (351, N'Imphal East', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (352, N'Senapati', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (353, N'Tamenglong', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (354, N'Thoubal', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (355, N'Ukhrul', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (356, N'Imphal West', 13)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (357, N'East Garo Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (358, N'East Khasi Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (359, N'Jaintia Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (360, N'Ri-Bhoi', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (361, N'South Garo Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (362, N'West Garo Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (363, N'West Khasi Hills', 14)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (364, N'Aizawl', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (365, N'Champhai', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (366, N'Kolasib', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (367, N'Lawngtlai', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (368, N'Lunglei', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (369, N'Mamit', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (370, N'Saiha', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (371, N'Serchhip', 15)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (372, N'Dimapur', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (373, N'Kohima', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (374, N'Mokokchung', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (375, N'Mon', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (376, N'Phek', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (377, N'Tuensang', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (378, N'Wokha', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (379, N'Zunheboto', 16)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (380, N'Angul', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (381, N'Boudh', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (382, N'Bhadrak', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (383, N'Bolangir', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (384, N'Bargarh', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (385, N'Baleswar', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (386, N'Cuttack', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (387, N'Debagarh', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (388, N'Dhenkanal', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (389, N'Ganjam', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (390, N'Gajapati', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (391, N'Jharsuguda', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (392, N'Jajapur', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (393, N'Jagatsinghpur', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (394, N'Khordha', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (395, N'Kendujhar', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (396, N'Kalahandi', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (397, N'Kandhamal', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (398, N'Koraput', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (399, N'Kendrapara', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (400, N'Malkangiri', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (401, N'Mayurbhanj', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (402, N'Nabarangpur', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (403, N'Nuapada', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (404, N'Nayagarh', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (405, N'Puri', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (406, N'Rayagada', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (407, N'Sambalpur', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (408, N'Subarnapur', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (409, N'Sundargarh', 17)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (410, N'Karaikal', 27)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (411, N'Mahe', 27)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (412, N'Puducherry', 27)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (413, N'Yanam', 27)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (414, N'Amritsar', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (415, N'Bathinda', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (416, N'Firozpur', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (417, N'Faridkot', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (418, N'Fatehgarh Sahib', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (419, N'Gurdaspur', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (420, N'Hoshiarpur', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (421, N'Jalandhar', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (422, N'Kapurthala', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (423, N'Ludhiana', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (424, N'Mansa', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (425, N'Moga', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (426, N'Mukatsar', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (427, N'Nawan Shehar', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (428, N'Patiala', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (429, N'Rupnagar', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (430, N'Sangrur', 18)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (431, N'Ajmer', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (432, N'Alwar', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (433, N'Bikaner', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (434, N'Barmer', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (435, N'Banswara', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (436, N'Bharatpur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (437, N'Baran', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (438, N'Bundi', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (439, N'Bhilwara', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (440, N'Churu', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (441, N'Chittorgarh', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (442, N'Dausa', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (443, N'Dholpur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (444, N'Dungapur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (445, N'Ganganagar', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (446, N'Hanumangarh', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (447, N'Juhnjhunun', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (448, N'Jalore', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (449, N'Jodhpur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (450, N'Jaipur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (451, N'Jaisalmer', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (452, N'Jhalawar', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (453, N'Karauli', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (454, N'Kota', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (455, N'Nagaur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (456, N'Pali', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (457, N'Pratapgarh', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (458, N'Rajsamand', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (459, N'Sikar', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (460, N'Sawai Madhopur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (461, N'Sirohi', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (462, N'Tonk', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (463, N'Udaipur', 19)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (464, N'East Sikkim', 20)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (465, N'North Sikkim', 20)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (466, N'South Sikkim', 20)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (467, N'West Sikkim', 20)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (468, N'Ariyalur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (469, N'Chennai', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (470, N'Coimbatore', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (471, N'Cuddalore', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (472, N'Dharmapuri', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (473, N'Dindigul', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (474, N'Erode', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (475, N'Kanchipuram', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (476, N'Kanyakumari', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (477, N'Karur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (478, N'Madurai', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (479, N'Nagapattinam', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (480, N'The Nilgiris', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (481, N'Namakkal', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (482, N'Perambalur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (483, N'Pudukkottai', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (484, N'Ramanathapuram', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (485, N'Salem', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (486, N'Sivagangai', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (487, N'Tiruppur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (488, N'Tiruchirappalli', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (489, N'Theni', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (490, N'Tirunelveli', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (491, N'Thanjavur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (492, N'Thoothukudi', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (493, N'Thiruvallur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (494, N'Thiruvarur', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (495, N'Tiruvannamalai', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (496, N'Vellore', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (497, N'Villupuram', 21)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (498, N'Dhalai', 22)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (499, N'North Tripura', 22)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (500, N'South Tripura', 22)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (501, N'West Tripura', 22)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (502, N'Almora', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (503, N'Bageshwar', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (504, N'Chamoli', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (505, N'Champawat', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (506, N'Dehradun', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (507, N'Haridwar', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (508, N'Nainital', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (509, N'Pauri Garhwal', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (510, N'Pithoragharh', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (511, N'Rudraprayag', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (512, N'Tehri Garhwal', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (513, N'Udham Singh Nagar', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (514, N'Uttarkashi', 33)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (515, N'Agra', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (516, N'Allahabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (517, N'Aligarh', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (518, N'Ambedkar Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (519, N'Auraiya', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (520, N'Azamgarh', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (521, N'Barabanki', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (522, N'Badaun', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (523, N'Bagpat', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (524, N'Bahraich', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (525, N'Bijnor', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (526, N'Ballia', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (527, N'Banda', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (528, N'Balrampur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (529, N'Bareilly', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (530, N'Basti', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (531, N'Bulandshahr', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (532, N'Chandauli', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (533, N'Chitrakoot', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (534, N'Deoria', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (535, N'Etah', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (536, N'Kanshiram Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (537, N'Etawah', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (538, N'Firozabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (539, N'Farrukhabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (540, N'Fatehpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (541, N'Faizabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (542, N'Gautam Buddha Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (543, N'Gonda', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (544, N'Ghazipur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (545, N'Gorkakhpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (546, N'Ghaziabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (547, N'Hamirpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (548, N'Hardoi', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (549, N'Mahamaya Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (550, N'Jhansi', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (551, N'Jalaun', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (552, N'Jyotiba Phule Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (553, N'Jaunpur District', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (554, N'Kanpur Dehat', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (555, N'Kannauj', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (556, N'Kanpur Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (557, N'Kaushambi', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (558, N'Kushinagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (559, N'Lalitpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (560, N'Lakhimpur Kheri', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (561, N'Lucknow', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (562, N'Mau', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (563, N'Meerut', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (564, N'Maharajganj', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (565, N'Mahoba', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (566, N'Mirzapur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (567, N'Moradabad', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (568, N'Mainpuri', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (569, N'Mathura', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (570, N'Muzaffarnagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (571, N'Pilibhit', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (572, N'Pratapgarh', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (573, N'Rampur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (574, N'Rae Bareli', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (575, N'Saharanpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (576, N'Sitapur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (577, N'Shahjahanpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (578, N'Sant Kabir Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (579, N'Siddharthnagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (580, N'Sonbhadra', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (581, N'Sant Ravidas Nagar', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (582, N'Sultanpur', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (583, N'Shravasti', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (584, N'Unnao', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (585, N'Varanasi', 23)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (586, N'Birbhum', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (587, N'Bankura', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (588, N'Bardhaman', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (589, N'Darjeeling', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (590, N'Dakshin Dinajpur', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (591, N'Hooghly', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (592, N'Howrah', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (593, N'Jalpaiguri', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (594, N'Cooch Behar', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (595, N'Kolkata', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (596, N'Malda', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (597, N'Midnapore', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (598, N'Murshidabad', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (599, N'Nadia', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (600, N'North 24 Parganas', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (601, N'South 24 Parganas', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (602, N'Purulia', 24)
+GO
+INSERT [dbo].[TblcityMaster] ([city_id], [city_name], [c_id]) VALUES (603, N'Uttar Dinajpur', 24)
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (1, N'ANDHRA PRADESH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (2, N'ASSAM')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (3, N'ARUNACHAL PRADESH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (4, N'BIHAR')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (5, N'GUJRAT')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (6, N'HARYANA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (7, N'HIMACHAL PRADESH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (8, N'JAMMU & KASHMIR')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (9, N'KARNATAKA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (10, N'KERALA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (11, N'MADHYA PRADESH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (12, N'MAHARASHTRA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (13, N'MANIPUR')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (14, N'MEGHALAYA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (15, N'MIZORAM')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (16, N'NAGALAND')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (17, N'ORISSA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (18, N'PUNJAB')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (19, N'RAJASTHAN')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (20, N'SIKKIM')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (21, N'TAMIL NADU')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (22, N'TRIPURA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (23, N'UTTAR PRADESH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (24, N'WEST BENGAL')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (25, N'DELHI')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (26, N'GOA')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (27, N'PONDICHERY')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (28, N'LAKSHDWEEP')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (29, N'DAMAN & DIU')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (30, N'DADRA & NAGAR')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (31, N'CHANDIGARH')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (32, N'ANDAMAN & NICOBAR')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (33, N'UTTARANCHAL')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (34, N'JHARKHAND')
+GO
+INSERT [dbo].[TblstateMaster] ([state_id], [state_name]) VALUES (35, N'CHATTISGARH')
+GO
+/****** Object:  StoredProcedure [dbo].[SP_CityMaster]    Script Date: 12/12/2023 3:21:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE procedure [dbo].[SP_CityMaster]
+@id int
+as
+begin
+	select '0' as[value], '--Select--' as[text]
+	union
+	select city_id as [value], city_name as[text] from TblcityMaster inner join TblstateMaster on TblcityMaster.c_id=TblstateMaster.state_id  where TblstateMaster.state_id=@id
+end
+GO
+/****** Object:  StoredProcedure [dbo].[SP_StateMaster]    Script Date: 12/12/2023 3:21:17 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+create procedure [dbo].[SP_StateMaster]
+as
+begin
+	select '0' as[value], '--Select--' as[text]
+	union
+	select state_id as [value], state_name as[text] from TblstateMaster
+end
+GO
