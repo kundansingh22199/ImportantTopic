@@ -1,0 +1,10 @@
+string profileimg = ObjData.Rows[0]["ProfileImg"].ToString();
+string FileExt = Path.GetExtension(profileimg);
+if (FileExt.ToUpper() == "PNG" || FileExt.ToUpper() == "JPG" || FileExt.ToUpper() == "JPEG" || FileExt.ToUpper() == "PDF" || FileExt.ToUpper() == "XLS" || FileExt.ToUpper() == "XLSX" || FileExt.ToUpper() == ".PNG" || FileExt.ToUpper() == ".JPG" || FileExt.ToUpper() == ".JPEG")
+{
+    ImgDp.ImageUrl = profileimg;
+}
+else 
+{
+    ImgDp.ImageUrl = "data:image/png;base64,"+ profileimg + "";
+}
