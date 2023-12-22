@@ -1,0 +1,23 @@
+// Select Last Data From table
+SELECT TOP 1 * FROM tblemp ORDER BY id DESC;
+
+
+
+//Select First Data From Table
+SELECT TOP 1 * FROM tblemp ORDER BY id;
+
+
+
+//use of group by clause
+SELECT
+    emp.name,
+    SUM(emp.salary - exp.expanse) AS net_income,
+    emp.createdate
+FROM
+    tblemp emp
+INNER JOIN
+    tblexpanse exp ON emp.id = exp.id
+WHERE
+    emp.id = 1
+GROUP BY
+    emp.name, emp.createdate;
