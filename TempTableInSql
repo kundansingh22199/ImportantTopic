@@ -1,0 +1,134 @@
+CREATE PROC USP_GetServiceIncomeReport --exec USP_GetServiceIncomeReport
+AS
+BEGIN
+    DECLARE @TempServiceReport TABLE (
+        Id INT IDENTITY(1,1),
+        TotalComm DECIMAL(18,6),
+        TotalSurCharge DECIMAL(18,6),
+        TotalTds DECIMAL(18,6),
+        TotalGst DECIMAL(18,6),
+        TotalTxnAmt DECIMAL(18,6),
+        ServiceName VARCHAR(255),
+        ServiceCode VARCHAR(100)
+    );
+
+    DECLARE @TempPaybleAmount DECIMAL(18,4);
+    DECLARE @TempComission DECIMAL(18,4);
+    DECLARE @TempSurCharge DECIMAL(18,4);
+    DECLARE @TempTDS DECIMAL(18,4);
+    DECLARE @TempGST DECIMAL(18,4);
+    DECLARE @TempServiceName VARCHAR(100);
+    DECLARE @TempServiceCode VARCHAR(50);
+
+    DECLARE @i INT = 1;
+    DECLARE @Max INT = (SELECT COUNT(ID) FROM TblServiceMaster WHERE ID IN (1,2,3,4,5,6,7,9,11,22));
+
+    WHILE @i <= @Max
+    BEGIN
+        IF @i = 1
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(PayableAmount) FROM TblRechargeReport WHERE ServiceID = 1 AND Status = 'Success');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblRechargeReport WHERE ServiceID = 1 AND Status = 'Success');
+            SET @TempSurCharge = 0.0;
+            SET @TempTDS = (SELECT SUM(TDS) FROM TblRechargeReport WHERE ServiceID = 1 AND Status = 'Success');
+            SET @TempGST = 0.0;
+            SET @TempServiceName = 'MOBILE';
+            SET @TempServiceCode = 'S001';
+        END
+        ELSE IF @i = 2
+        BEGIN
+			SET @TempPaybleAmount = (SELECT SUM(PayableAmount) FROM TblRechargeReport WHERE ServiceID = 2 AND Status = 'Success');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblRechargeReport WHERE ServiceID = 2 AND Status = 'Success');
+            SET @TempSurCharge = 0.0;
+            SET @TempTDS = (SELECT SUM(TDS) FROM TblRechargeReport WHERE ServiceID = 2 AND Status = 'Success');
+            SET @TempGST = 0.0;
+            SET @TempServiceName = 'DTH';
+            SET @TempServiceCode = 'S002';
+        END
+		ELSE IF @i = 3
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(Amount) FROM TblMoneyTransfer WHERE Status = 'SUCCESS');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblMoneyTransfer WHERE Status = 'SUCCESS');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblMoneyTransfer WHERE Status = 'SUCCESS');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblMoneyTransfer WHERE Status = 'SUCCESS');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblMoneyTransfer WHERE Status = 'SUCCESS');;
+            SET @TempServiceName = 'Money';
+            SET @TempServiceCode = 'S003';
+        END
+        ELSE IF @i = 4
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(Amount) FROM TblAepsTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblAepsTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblAepsTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblAepsTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblAepsTransactionMaster WHERE Status = 'SUCCESS');;
+            SET @TempServiceName = 'AEPS';
+            SET @TempServiceCode = 'S004';
+        END
+		ELSE IF @i = 5
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(PayableAmount) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Electricity');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Electricity');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Electricity');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Electricity');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Electricity');;
+            SET @TempServiceName = 'Electricity';
+            SET @TempServiceCode = 'S005';
+        END
+		ELSE IF @i = 6
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(PayableAmount) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='PostPaid');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='PostPaid');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='PostPaid');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='PostPaid');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='PostPaid');;
+            SET @TempServiceName = 'PostPaid';
+            SET @TempServiceCode = 'S006';
+        END
+		ELSE IF @i = 7
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(Amount) FROM SettlementMaster WHERE Status = 'SUCCESS');
+            SET @TempComission = (SELECT SUM(Commission) FROM SettlementMaster WHERE Status = 'SUCCESS');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM SettlementMaster WHERE Status = 'SUCCESS');
+            SET @TempTDS = (SELECT SUM(Tds) FROM SettlementMaster WHERE Status = 'SUCCESS');
+            SET @TempGST = (SELECT SUM(Gst) FROM SettlementMaster WHERE Status = 'SUCCESS');;
+            SET @TempServiceName = 'PayOut';
+            SET @TempServiceCode = 'S007';
+        END
+		ELSE IF @i = 8
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(PayableAmount) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Loan Repayment');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Loan Repayment');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Loan Repayment');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Loan Repayment');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblUtiliyReport WHERE Status = 'SUCCESS' AND ServiceType='Loan Repayment');;
+            SET @TempServiceName = 'Loan Repayment';
+            SET @TempServiceCode = 'S008';
+        END
+		ELSE IF @i = 9
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(Amount) FROM Tbl_UpiTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempComission = (SELECT SUM(Commission) FROM Tbl_UpiTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM Tbl_UpiTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempTDS = (SELECT SUM(Tds) FROM Tbl_UpiTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempGST = (SELECT SUM(Gst) FROM Tbl_UpiTransactionMaster WHERE Status = 'SUCCESS');;
+            SET @TempServiceName = 'Payment Gateway';
+            SET @TempServiceCode = 'S009';
+        END
+		ELSE IF @i = 10
+        BEGIN
+            SET @TempPaybleAmount = (SELECT SUM(Amount) FROM TblMatamTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempComission = (SELECT SUM(Commission) FROM TblMatamTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempSurCharge = (SELECT SUM(Surcharge) FROM TblMatamTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempTDS = (SELECT SUM(Tds) FROM TblMatamTransactionMaster WHERE Status = 'SUCCESS');
+            SET @TempGST = (SELECT SUM(Gst) FROM TblMatamTransactionMaster WHERE Status = 'SUCCESS');;
+            SET @TempServiceName = 'MATM';
+            SET @TempServiceCode = 'S0010';
+        END
+        INSERT INTO @TempServiceReport (TotalComm, TotalSurCharge, TotalTds, TotalGst, TotalTxnAmt, ServiceName, ServiceCode)
+        VALUES(@TempComission, @TempSurCharge, @TempTDS, @TempGST, @TempPaybleAmount, @TempServiceName, @TempServiceCode);
+        SET @i = @i + 1;
+    END
+    SELECT * FROM @TempServiceReport
+	---DROP TABLE @TempServiceReport
+END
