@@ -41,3 +41,14 @@ declare @ProductCode varchar(100)=(select ProductCode from TblProductMaster wher
 	Delete From TblImageMaster Where ProductId=@Id
 	Delete From TblStockMaster Where ProductCode=@ProductCode
 End
+
+
+-------------------------------------7 days Report---------------------------------------------
+SELECT RegNo, COUNT(RegNo) AS 'Weekly Writeups' FROM Tbl_Binary_Income WHERE Cast(CreateDate as date) BETWEEN DATEADD(d, -7, CONVERT(date, GETDATE())) AND CONVERT(date, GETDATE())GROUP BY RegNo;
+
+SELECT * FROM Tbl_Binary_Income WHERE CreateDate BETWEEN DATEADD(DAY, -7, CAST(GETDATE() AS DATETIME)) AND CAST(GETDATE() AS DATETIME)
+
+select * from Tbl_Binary_Income where CAST(FLOOR(CAST(CreateDate as float)) as datetime) between DATEADD(DAY, -7, CAST(GETDATE() AS DATE)) and CAST(GETDATE() AS DATE) order by id desc 
+
+
+
