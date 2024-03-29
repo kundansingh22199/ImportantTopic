@@ -1,0 +1,67 @@
+CREATE proc GetAllReportWithPage                            
+@UserId varchar(100),                                                
+@flag varchar(50) ,      
+@startind int,      
+@limit int  
+As                            
+BEGIN  
+declare @totcount int
+if @startind=0
+	set @startind=0
+if @startind=1
+	set @startind=1-1
+if @startind>1
+	set @startind = ((@startind-1) * @limit) 
+
+if (@flag='withdrawreport')                            
+begin                           
+    SELECT @totcount=COUNT(*) FROM tbl_ewallet where Regno=@UserId                   
+    select @totcount as totcount, e.regno,e.id,e.BitcoinAddress,e.adminhashno,e.Amount,e.Remarks,(Amount*.1)                            
+	as dedu,(Amount*.9) as netwith,withdra,createdate,e.CreditIn,e.Acholder_Name,e.AccountNo,e.IFSC,case when active=0 then 'Pending'                            
+	else case when active=1 then 'Approved' else case when active=2 then 'Rejected'                            
+	end end end as withrow_status,case when wallet=1 then 'Working'                            
+	else 'Non Working' end as wallet_type from tbl_ewallet e WITH (NOLOCK) inner join appmst a WITH (NOLOCK) on a.appmstregno=e.regno               
+	where Regno=@UserId ORDER BY id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;                 
+end                             
+                          
+if (@flag='binaryincome')                            
+ begin  
+ SELECT @totcount=COUNT(*) FROM Tbl_Binary_Income where Regno=@UserId
+  Select @totcount as totcount, Income,createdate,carryleft,carryright,lefttotal, righttotal                            
+  from Tbl_Binary_Income WITH (NOLOCK) where Regno=@UserId ORDER BY id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;                        
+end                             
+if (@flag='Topupdetails')                            
+ begin                            
+   SELECT @totcount=COUNT(*) FROM tbl_transaction_details where comefrom=@UserId and status=1                       
+   select @totcount as totcount, t.Regno,t.usd,t.createdate,t.comefrom,(select appmstfname from appmst a where a.appmstregno=t.regno)                            
+   as sname from tbl_transaction_details t where t.comefrom=@UserId and t.status=1 ORDER BY t.id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;  
+end                             
+                                
+ if @flag='fundrequestrpt'        
+ Begin  
+ SELECT @totcount=COUNT(*) FROM tbl_bank_details where regno=@UserId
+  Select @totcount as totcount, Regno,Amount,BankName,PMode,Remark,Receipt,createDate,case when status=0 then 'Pending' when status=1 then 'Paid' else 'Cancelled' end st,AccountHName,UTRNO 
+  from tbl_bank_details where regno=@UserId order by id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;        
+ End        
+ if @flag='receivewalletrpt'        
+ Begin  
+ SELECT @totcount=COUNT(*) FROM tbl_update_otherid where updateid=@UserId 
+  SELECT @totcount as totcount, * from tbl_update_otherid WHERE updateid=@UserId ORDER BY id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;       
+ End        
+ if @flag='transferwalletrpt'        
+ Begin 
+ SELECT @totcount=COUNT(*) FROM tbl_update_otherid where regno=@UserId and type=2
+  SELECT @totcount as totcount, * from tbl_update_otherid WHERE regno=@UserId and type=2 ORDER by id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;       
+ End          
+ if @flag='fundtransfer'    
+ begin 
+ SELECT @totcount=COUNT(*) FROM tbl_update_otherid where regno=@UserId and (type=2 or  type=3)
+ select @totcount as totcount, *,Case When type=2 Then 'Topup Wallet' When type=3 Then 'Working Wallet' End St 
+ from tbl_update_otherid WITH (NOLOCK) where regno=@UserId and (type=2 or  type=3) order by id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;    
+ end   
+ if (@flag='support_fund')        
+ begin   
+ SELECT @totcount=COUNT(*) FROM Tbl_Support_Fund where regno=@UserId
+ SELECT @totcount as totcount, * from Tbl_Support_Fund WHERE regno=@UserId order by id desc OFFSET @startind ROWS FETCH NEXT @limit ROWS ONLY;       
+ end  
+END 
