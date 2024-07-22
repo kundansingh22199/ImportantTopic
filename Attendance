@@ -1,0 +1,117 @@
+CREATE Proc SP_CreateAttendance    
+@adminId int,     
+@empId int,  
+@status varchar(10)  
+As    
+Begin    
+  if not exists (select top 1 * from Tbl_AttendanceMaster where adminId=@adminId and empId= @empId and Cast(createDate as Date)=CAST(dateadd(minute,(30),dateadd(hour,(5),getutcdate())) AS DATE) order by createDate desc)    
+  Begin   
+  if(@status='P')  
+  Begin  
+   insert into Tbl_AttendanceMaster(adminId,empId,punchInTime,attendanceStatus,createDate) values    
+   (@adminId,@empId,dateadd(minute,(30),dateadd(hour,(5),getutcdate())),@status,dateadd(minute,(30),dateadd(hour,(5),getutcdate())))    
+  ENd  
+  if(@status='A')  
+  Begin  
+   insert into Tbl_AttendanceMaster(adminId,empId,attendanceStatus,createDate) values    
+   (@adminId,@empId,@status,dateadd(minute,(30),dateadd(hour,(5),getutcdate())))    
+  End  
+  End    
+  else    
+  Begin  
+  declare @st varchar(10)  
+  SELECT @st = attendanceStatus FROM Tbl_AttendanceMaster WHERE adminId = @adminId AND empId = @empId AND Cast(createDate as Date) = CAST(DATEADD(minute, 30, DATEADD(hour, 5, GETUTCDATE())) AS DATE);    
+  if(@status='P' and @st!='A')  
+  Begin  
+   declare @workingHour varchar(100),@attendanceStatus varchar(20),@punchInTime datetime, @punchOutTime datetime, @workingSeconds INT    
+   SELECT @punchInTime = punchInTime FROM Tbl_AttendanceMaster WHERE adminId = @adminId AND empId = @empId AND Cast(createDate as Date) = CAST(DATEADD(minute, 30, DATEADD(hour, 5, GETUTCDATE())) AS DATE);    
+   set @punchOutTime=dateadd(minute,(30),dateadd(hour,(5),getutcdate()));    
+   SET @workingSeconds = DATEDIFF(SECOND, @punchInTime, @punchOutTime);    
+   --SET @workingHour = CONVERT(TIME, FORMAT(DATEADD(SECOND, DATEDIFF(SECOND, @punchInTime, @punchOutTime), 0), 'HH:mm:ss'));    
+   --SET @workingHour = Convert(CONVERT(TIME, DATEADD(SECOND, @workingSeconds, 0)),108);    
+   --SET @workingHour = DATEDIFF(minute, @punchInTime, @punchOutTime) / 60;    
+   SET @workingHour = CONVERT(varchar, DATEADD(SECOND, @workingSeconds, 0), 108);   
+  
+   SET @attendanceStatus = CASE WHEN @workingSeconds < 25200 THEN 'H' ELSE 'P' END;    
+   Update Tbl_AttendanceMaster set punchOutTime =@punchOutTime ,workingHour=@workingHour,attendanceStatus=@attendanceStatus    
+   where adminId=@adminId and empId= @empId and Cast(createDate as Date)=CAST(dateadd(minute,(30),dateadd(hour,(5),getutcdate())) AS DATE)    
+  End  
+  if(@status='A')  
+  Begin   
+   Update Tbl_AttendanceMaster set attendanceStatus=@status, punchInTime='',punchOutTime='',workingHour='' where adminId=@adminId and   
+   empId= @empId and Cast(createDate as Date)=CAST(dateadd(minute,(30),dateadd(hour,(5),getutcdate())) AS DATE)    
+  End  
+ End    
+End 
+
+
+Alter Proc SP_GetTodayAttendance  
+@adminId int  
+As  
+Begin  
+ SELECT em.adminid, em.empid, (em.firstName + ' ' + em.lastName) AS name, em.designation, am.punchInTime, am.punchOutTime,
+    am.attendanceStatus, am.workingHour, am.createDate FROM Tbl_EmployeeMaster em LEFT JOIN  (SELECT * FROM Tbl_AttendanceMaster 
+    WHERE CAST(createDate AS DATE) = CAST(DATEADD(MINUTE, 30, DATEADD(HOUR, 5, GETUTCDATE())) AS DATE)) am ON am.empid = em.empid
+	WHERE em.adminId = @adminId ORDER BY am.createDate DESC; 
+End
+
+Alter Proc SP_GetAllAttendance  
+@adminId int  
+As  
+Begin  
+ select am.adminid,am.empid,(em.firstName+' '+em.lastName) as name, em.designation,am.punchInTime,am.punchOutTime,
+ am.attendanceStatus,am.workingHour,am.createDate from Tbl_AttendanceMaster am left join Tbl_EmployeeMaster em 
+ on am.empid=em.empid where am.adminId=@adminId order by am.createDate desc  
+End
+
+Alter Proc SP_GetEmployeeAllAttendance  
+@adminId int,  
+@empId int  
+As  
+Begin  
+ select am.adminid,am.empid,(em.firstName+' '+em.lastName) as name, em.designation,am.punchInTime,am.punchOutTime,
+ am.attendanceStatus,am.workingHour,am.createDate from Tbl_AttendanceMaster am left join Tbl_EmployeeMaster em 
+ on am.empid=em.empid where am.adminId=@adminId AND MONTH(am.createDate) = MONTH(GETDATE()) AND 
+    YEAR(am.createDate) = YEAR(GETDATE()) and am.empId=@empId order by am.createDate desc  
+End
+
+Alter Proc SP_GetTodayEmployeeAllAttendance  
+@adminId int,  
+@empId int  
+As  
+Begin  
+ select am.adminid,am.empid,(em.firstName+' '+em.lastName) as name, em.designation,am.punchInTime,am.punchOutTime,
+ am.attendanceStatus,am.workingHour,am.createDate from Tbl_AttendanceMaster am left join Tbl_EmployeeMaster em 
+ on am.empid=em.empid where am.adminId=@adminId and am.empId=@empId and Cast(am.createDate as Date)=CAST(dateadd(minute,(30),dateadd(hour,(5),getutcdate())) AS DATE) order by am.createDate desc  
+End
+
+
+
+Alter Proc SP_GetAttendanceCount
+@adminId int
+As
+Begin
+	SELECT em.adminid, em.empid, (em.firstName + ' ' + em.lastName) AS name, em.designation,
+    SUM(CASE WHEN am.attendanceStatus = 'a' THEN 1 ELSE 0 END) AS totalAbsent,
+    SUM(CASE WHEN am.attendanceStatus = 'p' or am.attendanceStatus='h' THEN 1 ELSE 0 END) AS totalPresent,
+    COUNT(am.attendanceStatus) AS totalAttendance FROM Tbl_EmployeeMaster em LEFT JOIN Tbl_AttendanceMaster am 
+	ON am.empid = em.empid WHERE em.adminId = @adminId AND MONTH(am.createDate) = MONTH(GETDATE()) AND 
+    YEAR(am.createDate) = YEAR(GETDATE()) GROUP BY em.adminid, em.empid, em.firstName, em.lastName, em.designation
+	ORDER BY em.empid;
+End
+
+ALter Proc SP_GetAttendanceCountById
+@adminId int,
+@empId int
+As
+Begin
+	SELECT em.adminid, em.empid, (em.firstName + ' ' + em.lastName) AS name, em.designation,
+    SUM(CASE WHEN am.attendanceStatus = 'a' THEN 1 ELSE 0 END) AS totalAbsent,
+    SUM(CASE WHEN am.attendanceStatus = 'p' or am.attendanceStatus='h' THEN 1 ELSE 0 END) AS totalPresent,
+    COUNT(am.attendanceStatus) AS totalAttendance FROM Tbl_EmployeeMaster em LEFT JOIN Tbl_AttendanceMaster am 
+	ON am.empid = em.empid WHERE em.adminId = @adminId AND MONTH(am.createDate) = MONTH(GETDATE()) AND YEAR(am.createDate) = YEAR(GETDATE())
+	and em.empId=@empId GROUP BY em.adminid, em.empid, em.firstName, em.lastName, em.designation
+	ORDER BY em.empid;
+End
+
+
