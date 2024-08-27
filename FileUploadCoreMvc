@@ -1,0 +1,116 @@
+[Route("FileUpload")]
+public async Task<IActionResult> FileUpload([FromForm] ModFile obj)
+{
+    var response = new CommonResponse();
+    try
+    {
+        //string uid = CheckValidateUser();
+        string uid = "";
+        var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(token))
+        {
+            uid = TokenManager.ValidateToken(token);
+        }
+        if (string.IsNullOrEmpty(uid))
+        {
+            uid = "Invalid token or user not found.";
+        }
+        if (!string.IsNullOrEmpty(uid) && uid != "Invalid token or user not found.")
+        {
+            if (obj.Action.ToLower() == "add")
+            {
+                string filename = "";
+                string prefix = "plan" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                var httpRequest = HttpContext.Request;
+                if (httpRequest.Form.Files.Count > 0)
+                {
+                    var docfiles = new List<string>();
+                    foreach (var file in httpRequest.Form.Files)
+                    {
+                        var postedFile = file;
+                        filename = prefix + Path.GetFileName(postedFile.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UploadFile/", filename);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await postedFile.CopyToAsync(stream);
+                        }
+                        docfiles.Add(filePath);
+                        obj.File = filename;
+                    }
+
+                    //var updateimg = _contract.AddPopUp(0, "Add", filename);
+                    if (_contract.SetBusiness(0, obj.File, "Add"))
+                    {
+                        response = new CommonResponse { Status = "Success", Payload = filename, Message = "File Uploaded Successful" };
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        response = new CommonResponse { Status = "Error", Message = "Upload failed" };
+                        return BadRequest(response);
+                    }
+                }
+                else
+                {
+                    response = new CommonResponse { Status = "Error", Message = "No files found to upload" };
+                    return BadRequest(response);
+                }
+            }
+            else if (obj.Action.ToLower() == "active")
+            {
+                if (_contract.SetBusiness(Convert.ToInt32(obj.Id), "", "Active"))
+                {
+                    response = new CommonResponse { Status = "Success", Message = "File Active Successful" };
+                    return Ok(response);
+                }
+                else
+                {
+                    response = new CommonResponse { Status = "Error", Message = "Active failed" };
+                    return BadRequest(response);
+                }
+            }
+            else if (obj.Action.ToLower() == "inactive")
+            {
+                if (_contract.SetBusiness(Convert.ToInt32(obj.Id), "", "InActive"))
+                {
+                    response = new CommonResponse { Status = "Success", Message = "File InActive Successful" };
+                    return Ok(response);
+                }
+                else
+                {
+                    response = new CommonResponse { Status = "Error", Message = "InActive failed" };
+                    return BadRequest(response);
+                }
+            }
+            else if (obj.Action.ToLower() == "delete")
+            {
+                if (_contract.SetBusiness(Convert.ToInt32(obj.Id), "", "Delete"))
+                {
+                    response = new CommonResponse { Status = "Success", Message = "File Delete Successful" };
+                    return Ok(response);
+                }
+                else
+                {
+                    response = new CommonResponse { Status = "Error", Message = "Delete failed" };
+                    return BadRequest(response);
+                }
+            }
+            else
+            {
+                response = new CommonResponse { Status = "Error", Message = "Invalid Action" };
+                return BadRequest(response);
+            }
+        }
+        else
+        {
+            response = new CommonResponse { Status = "Error", Message = "Access Denied" };
+            return StatusCode(StatusCodes.Status403Forbidden, response);
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error during File Upload");
+        response = new CommonResponse { Status = "Error", Message = "Something went wrong, Please try again...!" };
+        return StatusCode(StatusCodes.Status400BadRequest, response);
+    }
+}
