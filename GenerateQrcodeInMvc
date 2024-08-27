@@ -1,0 +1,32 @@
+public void contertoqr()
+{
+    modqrrefferal objref = new modqrrefferal();
+    string userid = Convert.ToString(Session["userid"]).ToString();
+    if (userid != null)
+    {
+        string qstr2 = "Select T_RPV from Appmst where Appmstregno='" + userid + "'";
+        DataTable t2 = new DataTable();
+        SqlCommand cmd2 = new SqlCommand(qstr2, con);
+        SqlDataAdapter da2 = new SqlDataAdapter(cmd2);
+        da2.Fill(t2);
+        int st = Convert.ToInt32(t2.Rows[0][0]);
+        if (st == 0)
+        {
+            objref.refferallink = "https://bitfarms.ai/SignUp/Register?sid=" + userid + "";
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(objref.refferallink, QRCodeGenerator.ECCLevel.Q);
+            QRCode qrCode = new QRCode(qrCodeData);
+            Bitmap qrCodeImage = qrCode.GetGraphic(20);
+
+            string folderPath = Server.MapPath("~/refferralcode");
+          
+            string fileName = Path.Combine(folderPath, userid + "_" + "QRCode.png");
+            qrCodeImage.Save(fileName, ImageFormat.Png);
+            string qstr = "Update appmst set T_RPV=1,user_img='" + fileName + "' where appmstregno='" + userid + "'";
+            SqlCommand cmd = new SqlCommand(qstr, con);
+            con.Open();
+            cmd.ExecuteNonQuery();
+            con.Close();
+        }
+    }
+}
