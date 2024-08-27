@@ -1,0 +1,71 @@
+[HttpPost]
+[Route("UpdateImage")]
+public async Task<IActionResult> UpdateImage()
+{
+    var response = new CommonResponse();
+    try
+    {
+        //string uid = CheckValidateUser();
+        string uid = "";
+        var token = Request.Headers["X-Auth-Token"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(token))
+        {
+            uid = TokenManager.ValidateToken(token);
+        }
+        if (string.IsNullOrEmpty(uid))
+        {
+            uid = "Invalid token or user not found.";
+        }
+        if (!string.IsNullOrEmpty(uid) && uid != "Invalid token or user not found.")
+        {
+            string filename = "";
+            string prefix = "nvshoppe" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            var httpRequest = HttpContext.Request;
+            if (httpRequest.Form.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (var file in httpRequest.Form.Files)
+                {
+                    var postedFile = file;
+                    filename = prefix + Path.GetFileName(postedFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UploadImage/", filename);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await postedFile.CopyToAsync(stream);
+                    }
+                    docfiles.Add(filePath);
+                    filename = filename;
+                }
+
+                //var updateimg = _contract.AddPopUp(0, "Add", filename);
+                if (_contract.UploadUserImage(uid, filename))
+                {
+                    response = new CommonResponse { Status = "Success", Payload = filename, Message = "Image Upload Successful" };
+                    return Ok(response);
+                }
+                else
+                {
+                    response = new CommonResponse { Status = "Error", Message = "Upload failed" };
+                    return BadRequest(response);
+                }
+            }
+            else
+            {
+                response = new CommonResponse { Status = "Error", Message = "No files found to upload" };
+                return BadRequest(response);
+            }
+        }
+        else
+        {
+            response = new CommonResponse { Status = "Error", Message = "Access Denied" };
+            //return BadRequest(response);
+            return StatusCode(StatusCodes.Status403Forbidden, response);
+        }
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error during UpdateImage.");
+        response = new CommonResponse { Status = "Error", Message = "Something went wrong, Please try again...!" };
+        return StatusCode(StatusCodes.Status400BadRequest, response);
+    }
+}
