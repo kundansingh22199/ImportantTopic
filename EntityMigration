@@ -1,3 +1,14 @@
 "Initial Migration"
 Add-Migration AddEmployeeTable
 Update-Database
+
+
+Scaffold-DbContext Name=SqlCon Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+
+"ConnectionStrings": {
+  "SqlCon": "Server=LAPTOP-0I2497SN\\SQLEXPRESS; Database=SSCapital; Trusted_Connection=True; TrustServerCertificate=True;"
+}
+
+"ConnectionStrings": {
+  "SqlCon": "Data Source=175.111.97.162; Initial Catalog=DemoEntity; User ID=sa; Password=MnbSoft2017!@#; Encrypt=True; TrustServerCertificate=True;"
+}
