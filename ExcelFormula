@@ -1,0 +1,1 @@
+="UPDATE appmst SET appmstpassword='"&B2&"', appmstlogin='"&C2&"', usdtaddress='"&D2&"' WHERE appmstregno='"&A2&"';"
