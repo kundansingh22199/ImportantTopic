@@ -1,0 +1,60 @@
+--------------For Dotnet Mvc---------------
+
+Install-Package EntityFramework
+
+Enable-Migrations
+Add-Migration InitialCreate
+Update-Database
+
+
+
+-----------Add Connection String--------------
+<add name="sqlcon" connectionString="Data Source=LAPTOP-0I2497SN\SQLEXPRESS;Initial Catalog=testmvc;Integrated Security=True;" providerName="System.Data.SqlClient" />
+<add name="sqlcon" connectionString="Data Source=175.111.97.88;Initial Catalog=testDB;User ID=sa; Password=MnbSoft2017!@#; Encrypt=false;" providerName="system.data.SqlClient" />
+
+
+
+------------*******************---------------
+
+public class ApplicationDbContext : DbContext
+{
+    public DbSet<Student> Students { get; set; }
+    public ApplicationDbContext() : base("sqlcon")
+    {
+    }
+}
+
+
+-------------For Controller Action------------
+
+private ApplicationDbContext db = new ApplicationDbContext();
+
+-----------Create--------------
+
+db.Students.Add(student); 
+db.SaveChanges();         
+return RedirectToAction("Index");
+
+-----------List------------
+
+var students = db.Students.ToList(); 
+
+----------Details----------
+
+Student student = db.Students.Find(id);
+
+------------Update-------------
+
+db.Entry(student).State = EntityState.Modified; 
+db.SaveChanges();
+
+
+-----------Delete-----------
+
+Student student = db.Students.Find(id); 
+db.Students.Remove(student);            
+db.SaveChanges();        
+
+
+
+
