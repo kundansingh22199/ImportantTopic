@@ -29,10 +29,23 @@ Rename Table Column
  Exec  sp_rename 'TblSizeMaster.Id','SizeId','Column'
 
 
--------------------------------------------------------------
+-------------------------Getn All Table And Procedure------------------------------------
 SELECT * FROM sys.objects WHERE type = 'U' or type='P'
 
+-------------------------Get All Table--------------------------------------------------
 SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME
+
+-------------------------Get All Procedure-----------------------------------------------
+SELECT 
+    ROUTINE_SCHEMA AS ProcedureSchema,
+    ROUTINE_NAME AS ProcedureName,
+    ROUTINE_TYPE AS RoutineType
+FROM 
+    INFORMATION_SCHEMA.ROUTINES
+WHERE 
+    ROUTINE_TYPE = 'PROCEDURE'
+ORDER BY 
+    ROUTINE_NAME;
 
 ------------------------------------------------------------------
 
