@@ -47,7 +47,8 @@ WHERE
 ORDER BY 
     ROUTINE_NAME;
 
-------------------------------------------------------------------
+---------------------------Get ALl Database---------------------------------------
+SELECT name AS DatabaseName FROM sys.databases ORDER BY name;
 
 -------------------------------------7 days Report---------------------------------------------
 SELECT RegNo, COUNT(RegNo) AS 'Weekly Writeups' FROM Tbl_Binary_Income WHERE Cast(CreateDate as date) BETWEEN DATEADD(d, -7, CONVERT(date, GETDATE())) AND CONVERT(date, GETDATE())GROUP BY RegNo;
