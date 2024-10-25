@@ -28,20 +28,13 @@ exec  ProcedureName ColumnName=Value
 Rename Table Column
  Exec  sp_rename 'TblSizeMaster.Id','SizeId','Column'
 
-------------------------------------------------------------------
-delete multiple table data  procedure
-------------------------------------------------------------------
 
-create proc SP_DeleteStockProductAndImageByProductCode
-@Id varchar(100)
-As
-Begin
-declare @ProductCode varchar(100)=(select ProductCode from TblProductMaster where Id=@Id )
-	Delete From TblProductMaster Where Id=@Id
-	Delete From TblImageMaster Where ProductId=@Id
-	Delete From TblStockMaster Where ProductCode=@ProductCode
-End
+-------------------------------------------------------------
+SELECT * FROM sys.objects WHERE type = 'U' or type='P'
 
+SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE FROM INFORMATION_SCHEMA.TABLES ORDER BY TABLE_NAME
+
+------------------------------------------------------------------
 
 -------------------------------------7 days Report---------------------------------------------
 SELECT RegNo, COUNT(RegNo) AS 'Weekly Writeups' FROM Tbl_Binary_Income WHERE Cast(CreateDate as date) BETWEEN DATEADD(d, -7, CONVERT(date, GETDATE())) AND CONVERT(date, GETDATE())GROUP BY RegNo;
