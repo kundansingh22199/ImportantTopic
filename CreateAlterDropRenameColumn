@@ -1,0 +1,65 @@
+CREATE PROCEDURE AlterTable_ColumnOperations -- exec AlterTable_ColumnOperations 'Tbl_test','RENAME','ColumnName','int','NewColumnName' 
+    @TableName NVARCHAR(128),
+    @Operation NVARCHAR(10), -- 'ADD', 'ALTER', 'DROP', or 'RENAME'
+    @ColumnName NVARCHAR(128) = NULL,
+    @ColumnType NVARCHAR(128) = NULL, -- Required for 'ADD' and 'ALTER'
+    @NewColumnName NVARCHAR(128) = NULL -- Required for 'RENAME'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Declare a variable for the dynamic SQL
+    DECLARE @sql NVARCHAR(MAX);
+
+    -- Determine the operation
+    IF @Operation = 'ADD'
+    BEGIN
+        IF @ColumnName IS NULL OR @ColumnType IS NULL
+        BEGIN
+            RAISERROR('ColumnName and ColumnType are required for ADD operation.', 16, 1);
+            RETURN;
+        END
+        SET @sql = 'ALTER TABLE ' + QUOTENAME(@TableName) + 
+                   ' ADD ' + QUOTENAME(@ColumnName) + ' ' + @ColumnType;
+    END
+    ELSE IF @Operation = 'ALTER'
+    BEGIN
+        IF @ColumnName IS NULL OR @ColumnType IS NULL
+        BEGIN
+            RAISERROR('ColumnName and ColumnType are required for ALTER operation.', 16, 1);
+            RETURN;
+        END
+        SET @sql = 'ALTER TABLE ' + QUOTENAME(@TableName) + 
+                   ' ALTER COLUMN ' + QUOTENAME(@ColumnName) + ' ' + @ColumnType;
+    END
+    ELSE IF @Operation = 'DROP'
+    BEGIN
+        IF @ColumnName IS NULL
+        BEGIN
+            RAISERROR('ColumnName is required for DROP operation.', 16, 1);
+            RETURN;
+        END
+        SET @sql = 'ALTER TABLE ' + QUOTENAME(@TableName) + 
+                   ' DROP COLUMN ' + QUOTENAME(@ColumnName);
+    END
+    ELSE IF @Operation = 'RENAME'
+    BEGIN
+        IF @ColumnName IS NULL OR @NewColumnName IS NULL
+        BEGIN
+            RAISERROR('ColumnName and NewColumnName are required for RENAME operation.', 16, 1);
+            RETURN;
+        END
+        SET @sql = 'EXEC sp_rename ''' + @TableName + '.' + @ColumnName + ''', ''' + @NewColumnName + ''', ''COLUMN''';
+    END
+    ELSE
+    BEGIN
+        RAISERROR('Invalid operation. Use ADD, ALTER, DROP, or RENAME.', 16, 1);
+        RETURN;
+    END
+
+    -- Execute the dynamic SQL
+    EXEC sp_executesql @sql;
+
+    PRINT 'Operation completed successfully.';
+END;
+GO
