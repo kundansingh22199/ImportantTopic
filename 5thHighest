@@ -1,0 +1,2 @@
+***********************************5th Highest Amount*****************************
+SELECT distinct usd FROM Tbl_Transaction_Details ORDER BY usd DESC OFFSET 4 ROWS FETCH NEXT 1 ROW ONLY;
