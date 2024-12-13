@@ -130,3 +130,126 @@ BEGIN
     END
 END;
 GO
+
+
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
+Create TRIGGER PreventUpdate_LevelInc
+ON Tbl_Level_Income
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @OldLevelInc DECIMAL(18,4), @NewLevelInc DECIMAL(18,4), @Id INT;
+    SELECT @OldLevelInc = d.LevelInc, @NewLevelInc = i.LevelInc, @Id = i.Id
+    FROM inserted i JOIN deleted d ON i.Id = d.Id;
+    IF @OldLevelInc <> @NewLevelInc
+    BEGIN
+        UPDATE Tbl_Level_Income SET LevelInc = @OldLevelInc WHERE Id = @Id;
+    END
+END
+GO
+
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
+Create TRIGGER PreventUpdate_LevelInc
+   ON  Tbl_Level_Income
+   AFTER UPDATE
+AS 
+BEGIN
+	Declare	@amount	decimal(18,2),@RegNo varchar(30),@id int
+	SELECT @RegNo = [sid] from deleted
+	SELECT @amount = LevelInc from deleted
+	SELECT @id = id from deleted
+	update	Tbl_Level_Income	set	[sid]=@RegNo,LevelInc=@amount where id=@id
+END
+
+
+******************************************Create Trigger for Stop Update Table***************************************** 
+ALter TRIGGER PreventUpdate_LevelInc
+ON Tbl_Level_Income
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    --RAISERROR ('Updates to the Tbl_Level_Income table are not allowed.', 16, 1);
+    ROLLBACK TRANSACTION;
+END
+GO
+
+
+******************************************Create Trigger for Stop Delete Table***************************************** 
+CREATE TRIGGER PreventDelete_LevelInc
+ON Tbl_Level_Income
+AFTER DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    RAISERROR ('Deletion of rows from Tbl_Level_Income is not allowed.', 16, 1);
+    ROLLBACK TRANSACTION;
+END
+GO
+
+
+******************************************Create Trigger for Stop Delete Table***************************************** 
+CREATE TRIGGER PreventDelete_Tbl_Level_Income
+ON Tbl_Level_Income
+INSTEAD OF DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    RAISERROR ('Deleting rows from the Tbl_Level_Income table is not allowed.', 16, 1);
+END
+GO
+
+
+******************************************Create Trigger for Drop Table Alter Table***************************************** 
+-- Step 1: Create a dummy table
+CREATE TABLE DummyTable (
+    DummyId INT PRIMARY KEY
+);
+
+-- Step 2: Add a foreign key constraint to Tbl_Level_Income
+ALTER TABLE Tbl_Level_Income
+ADD CONSTRAINT FK_Tbl_Level_Income_Dummy
+FOREIGN KEY (Id)
+REFERENCES DummyTable (DummyId);
+
+************************************************************************************
+DENY ALTER ON Tbl_Level_Income TO [username_or_role];
+
+************************************************************************************
+-- Step 1: Create a secure schema
+CREATE SCHEMA SecureSchema;
+
+-- Step 2: Move the table to the secure schema
+ALTER SCHEMA SecureSchema TRANSFER dbo.Tbl_Level_Income;
+
+-- Step 3: Restrict permissions on the schema
+DENY ALTER ON SCHEMA::SecureSchema TO [username_or_role];
+
+************************************************************************************
+CREATE TRIGGER PreventTruncate
+ON DATABASE
+FOR DROP_TABLE, ALTER_TABLE
+AS
+BEGIN
+    PRINT 'A DDL operation has been attempted!';
+    -- Log the event to a table or error log
+END;
+
+
+
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
+CREATE TRIGGER Update_appmst_data
+   ON  AppMst
+   AFTER UPDATE
+AS 
+BEGIN
+    SET NOCOUNT ON;
+	Declare	@amount	decimal(18,2),@RegNo varchar(30),@address varchar(100),@id int
+	SELECT @RegNo = AppMstRegNo from deleted
+	SELECT @address = BitCoinAddress from deleted
+	SELECT @id = AppMstID from deleted
+	update	appmst	set	BitCoinAddress=@address,AppMstRegNo=@RegNo where AppMstID=@id
+END
+GO
+
