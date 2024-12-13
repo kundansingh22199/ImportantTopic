@@ -1,4 +1,4 @@
-******************************************Create Trigger for Stop Update LevelInc***************************************** 
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
 Create TRIGGER PreventUpdate_LevelInc
 ON Tbl_Level_Income
 AFTER UPDATE
@@ -14,6 +14,19 @@ BEGIN
     END
 END
 GO
+
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
+Create TRIGGER PreventUpdate_LevelInc
+   ON  Tbl_Level_Income
+   AFTER UPDATE
+AS 
+BEGIN
+	Declare	@amount	decimal(18,2),@RegNo varchar(30),@id int
+	SELECT @RegNo = [sid] from deleted
+	SELECT @amount = LevelInc from deleted
+	SELECT @id = id from deleted
+	update	Tbl_Level_Income	set	[sid]=@RegNo,LevelInc=@amount where id=@id
+END
 
 
 ******************************************Create Trigger for Stop Update Table***************************************** 
