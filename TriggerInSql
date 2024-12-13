@@ -101,3 +101,32 @@ BEGIN
     PRINT 'A DDL operation has been attempted!';
     -- Log the event to a table or error log
 END;
+
+
+
+******************************************Create Trigger for Stop Update Particular Column***************************************** 
+Create TRIGGER PreventUpdate_LevelInc
+ON Tbl_Level_Income
+INSTEAD OF UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @OldLevelInc DECIMAL(18,4), @NewLevelInc DECIMAL(18,4), @Id INT;
+    -- Get the old and new values of LevelInc
+    SELECT @OldLevelInc = d.LevelInc, @NewLevelInc = i.LevelInc, @Id = i.Id
+    FROM inserted i JOIN deleted d ON i.Id = d.Id;
+    -- Check if the LevelInc has changed
+    IF @OldLevelInc <> @NewLevelInc
+    BEGIN
+        -- Set the LevelInc value back to the old value (prevent update)
+        UPDATE Tbl_Level_Income SET LevelInc = @OldLevelInc WHERE Id = @Id;
+    END
+    ELSE
+    BEGIN
+        -- Allow the update to proceed as normal
+        UPDATE Tbl_Level_Income SET RegNo = i.RegNo, SID = i.SID, TotalAmt = i.TotalAmt, LevelNo = i.LevelNo,
+            CreateDate = i.CreateDate, TDS = i.TDS, Admin = i.Admin, NetAmt = i.NetAmt, withdra = i.withdra,
+            [type] = i.[type], upgrade = i.upgrade, status = i.status FROM inserted i WHERE Tbl_Level_Income.Id = i.Id;
+    END
+END;
+GO
