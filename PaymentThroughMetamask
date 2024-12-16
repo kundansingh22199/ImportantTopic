@@ -1,0 +1,618 @@
+<script src="~/moralisv1.js"></script>
+<script src="~/web3min.js"></script>
+
+<script>
+    function addrandome(amt) {
+
+        $.ajax({
+            type: "POST",
+            url: "Addrandome",
+            data: { amount: amt},
+
+            success: onSuccess,
+            failure: function (response) {
+                //document.getElementById("lblMessage").innerHTML = "Error occured..";
+            }
+        });
+
+        function onSuccess(response) {
+            if (response !=0) {
+                
+            }
+        }
+    }
+</script>
+<script type="text/javascript">
+    function waitForMe(milliseconds) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, milliseconds);
+        });
+    }
+    const CONTRACT_ABI = [
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "initialSupply",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Approval",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Transfer",
+            "type": "event"
+        },
+        {
+            "inputs": [],
+            "name": "Owner",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                }
+            ],
+            "name": "allowance",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "approve",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                }
+            ],
+            "name": "balanceOf",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [
+                {
+                    "internalType": "uint8",
+                    "name": "",
+                    "type": "uint8"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "subtractedValue",
+                    "type": "uint256"
+                }
+            ],
+            "name": "decreaseAllowance",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "addedValue",
+                    "type": "uint256"
+                }
+            ],
+            "name": "increaseAllowance",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transfer",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "amount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transferFrom",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ]
+
+    // var txHashGlobal;
+    // const ConnectWallet = async (amount) => {
+    //     debugger
+
+    //     addrandome(amount);
+    //     var contractAddress;
+    //     contractAddress = "@(Model.contractadd?.Trim())";
+    //     var amt1 = amount;
+    //     const amount1 = amt1;
+    //     let transaction;
+    //     let balance;
+    //     let from;
+    //     try {
+    //         if (parseFloat(parseFloat(amount1).toFixed(2)) >= 0) {
+    //             if (window.ethereum) {
+    //                 debugger
+    //                 const chainId = await window.ethereum.request({
+    //                     method: "eth_chainId",
+    //                 });
+
+    //                 if (chainId != "0x38") {
+    //                     alert("Please connect to BSC Network.");
+    //                 } else {
+    //                     let add = await window.ethereum.request({
+    //                         method: "eth_requestAccounts",
+    //                     });
+    //                     debugger
+    //                     const ethers = Moralis.web3Library
+    //                     const provider = await new ethers.providers.Web3Provider(window.ethereum);
+    //                     const signer = await provider.getSigner()
+    //                     const contract = await new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+    //                     console.log(add);
+    //                     var amt = amount1;
+    //                     var token = parseFloat(parseFloat(amount1).toFixed(2));
+
+    //                     const receiver = "@(Model.receiveraddress?.Trim())";
+    //                     $.ajax({
+    //                         type: "POST",
+    //                         url: "IsExists",
+    //                         data: { Uid: receiver },
+    //                         success: async function (response) {
+    //                             if (response != "") {
+    //                                 try {
+    //                                     debugger
+    //                                     const functionCallData = await contract.interface.encodeFunctionData('transfer', [receiver, Moralis.Units.Token(token, "18")])
+    //                                     let userBalance = await contract.balanceOf(add[0])
+    //                                     userBalance = (Number(userBalance) / 10 ** 18).toFixed(2)
+    //                                     const isBalanceSufficient = Number(userBalance) >= Number(token) ? true : false
+    //                                     // alert(Number(userBalance) >= Number(token) ? true : false)
+    //                                     if (!isBalanceSufficient) {
+    //                                         alert("Insufficient Funds")
+    //                                         return
+    //                                     }
+    //                                     const web3 = await Moralis.enableWeb3();
+    //                                     const options = {
+    //                                         type: "erc20",
+    //                                         amount: Moralis.Units.ETH(amt.toString()),
+    //                                         receiver: receiver,
+    //                                         contract_address: contractAddress,
+    //                                     };
+
+
+    //                                     if (web3.connection.url !== 'metamask') {
+    //                                         const tx = window.ethereum.request({
+    //                                             method: 'eth_sendTransaction',
+    //                                             params: [{
+    //                                                 from: add[0],
+    //                                                 to: '@(Model.contractadd?.Trim())',
+    //                                                 value: '0x0', // 2441406250,
+    //                                                 gasLimit: '0x30D40',
+    //                                                 //gasLimit: 100000,
+    //                                                 gasPrice: 3500000000,
+
+
+    //                                                 // gasLimit: ethers.utils.hexlify(100000),
+    //                                                 // gasPrice: ethers.utils.hexlify(3500000000),
+    //                                                 //maxFeePerGas: '0x4A817C800', // Max total fee (in wei)
+    //                                                 //maxPriorityFeePerGas: '0x3B9ACA00', // Priority fee (in wei)
+    //                                                 data: functionCallData,
+
+    //                                             }],
+    //                                         }).then(async (result) => {
+    //                                             debugger
+    //                                             if (!result) window.alert("Something went wrong!");
+    //                                             else {
+    //                                                 debugger
+    //                                                 console.log(result);
+    //                                                 res = result;
+    //                                                 console.log(res);
+    //                                                 console.log("I am here")
+    //                                                 // await waitForMe(10000)
+    //                                                 Update_data(res, amount1, add[0], options.receiver);
+    //                                             }
+    //                                         })
+    //                                             .catch((error) => {
+    //                                                 //window.alert(error.message);
+    //                                                 if (error.message == "Internal JSON-RPC error.") {
+    //                                                     debugger
+    //                                                     alert('Insufficient fund');
+    //                                                 }
+    //                                                 else {
+    //                                                     debugger
+    //                                                     alert(error.message);
+    //                                                 }
+
+    //                                             });
+    //                                     } else {
+    //                                         Moralis.transfer(options)
+    //                                             .then(async (result) => {
+    //                                                 if (!result) window.alert("Something went wrong!");
+    //                                                 else {
+    //                                                     debugger
+    //                                                     console.log(result);
+    //                                                     res = result.hash;
+    //                                                     console.log(res);
+    //                                                     //  await waitForMe(10000)
+    //                                                     Update_data(res, amount1, result.from, receiver);
+    //                                                 }
+    //                                             })
+    //                                             .catch((error) => {
+    //                                                 //window.alert(error.message);
+    //                                                 if (error.message == "Internal JSON-RPC error.") {
+    //                                                     debugger
+    //                                                     alert('Insufficient fund');
+    //                                                 }
+    //                                                 console.log(error);
+    //                                             });
+    //                                     }
+
+    //                                 } catch (err) {
+    //                                     debugger
+    //                                     console.log("Err", err);
+    //                                     alert(err);
+    //                                 }
+    //                             } else {
+    //                                 alert("User does not exist.");
+    //                             }
+    //                         },
+    //                         error: function (jqXHR, textStatus, errorThrown) {
+    //                             console.log("AJAX error: ", textStatus, errorThrown);
+    //                             alert("Failed to connect to server. Please check your network or endpoint.");
+    //                         }
+    //                     });
+    //                 }
+    //             } else {
+    //                 alert("Please Connect To BEP20 Network!");
+    //             }
+    //         }
+    //         else {
+    //             alert('Please enter amount minimum $1');
+    //         }
+
+    //     } catch (e) {
+    //         console.log(e)
+    //     }
+    // }
+    var txHashGlobal;
+    const ConnectWallet = async (amount) => {
+        debugger;
+
+        // if (!amount || isNaN(amount) || parseFloat(amount) < 1) {
+        //     alert("Please enter a valid amount (minimum $1).");
+        //     return;
+        // }
+        addrandome(amount);
+        const contractAddress = "@(Model.contractadd?.Trim())";
+        //const receiver = "@(Model.receiveraddress?.Trim())";
+        const receiver = "0xd17734c56e26AB6a5880B5497f44654e75445337";
+
+        // if (!ethers.utils.isAddress(receiver)) {
+        //     alert("Invalid receiver address.");
+        //     return;
+        // }
+
+        try {
+            if (window.ethereum) {
+                debugger;
+
+                const chainId = await window.ethereum.request({ method: "eth_chainId" });
+                if (chainId !== "0x38") {
+                    alert("Please connect to the Binance Smart Chain (BSC) network.");
+                    return;
+                }
+
+                const [userAddress] = await window.ethereum.request({ method: "eth_requestAccounts" });
+
+                const ethers = Moralis.web3Library;
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const signer = provider.getSigner();
+                const contract = new ethers.Contract(contractAddress, CONTRACT_ABI, signer);
+
+                // Ensure sufficient balance
+                const userBalanceRaw = await contract.balanceOf(userAddress);
+                const userBalance = parseFloat(ethers.utils.formatUnits(userBalanceRaw, 18)).toFixed(2);
+                const tokenAmount = parseFloat(amount).toFixed(4);
+
+                if (parseFloat(userBalance) < tokenAmount) {
+                    alert("Insufficient token balance.");
+                    return;
+                }
+
+                // check backend receiver address existence
+                $.ajax({
+                    type: "POST",
+                    url: "IsExists",
+                    data: { Uid: receiver },
+                    success: async function (response) {
+                        if (!response) {
+                            alert("Receiver does not exist.");
+                            return;
+                        }
+
+                        try {
+                            // Prepare secure transaction
+                            const functionCallData = contract.interface.encodeFunctionData('transfer', [receiver, ethers.utils.parseUnits(tokenAmount, 18)]);
+                            const transaction = {
+                                to: contractAddress,
+                                data: functionCallData,
+                                gasLimit: ethers.utils.hexlify(100000), // Set a gas limit
+                                gasPrice: ethers.utils.hexlify(await provider.getGasPrice()), // Get current gas price
+                            };
+
+                            // Send transaction securely
+                            const txResponse = await signer.sendTransaction(transaction);
+                            console.log("Transaction Sent: ", txResponse);
+                            alert(`Transaction initiated. TxHash: ${txResponse.hash}`);
+
+                            // Wait for transaction confirmation
+                            const receipt = await provider.waitForTransaction(txResponse.hash);
+                            console.log("Transaction Receipt: ", receipt);
+
+                            if (receipt.status === 1) {
+                                // Post-transaction validation
+                                const txDetails = await provider.getTransaction(txResponse.hash);
+                                const decodedInput = ethers.utils.defaultAbiCoder.decode(
+                                    ["address", "uint256"],
+                                    ethers.utils.hexDataSlice(txDetails.data, 4)
+                                );
+
+                                const [txReceiver, txAmount] = decodedInput;
+                                const verifiedAmount = parseFloat(ethers.utils.formatUnits(txAmount, 18)).toFixed(4);
+
+                                if (txReceiver === receiver && verifiedAmount === tokenAmount) {
+                                    console.log("Transaction verified.");
+                                    Update_data(txResponse.hash, tokenAmount, userAddress, receiver);
+                                } else {
+                                    alert("Transaction validation failed! Data mismatch.");
+                                }
+                            } else {
+                                alert("Transaction failed. Check the blockchain explorer for details.");
+                            }
+                        } catch (error) {
+                            console.error("Transaction Error: ", error);
+                            alert(error.message || "An error occurred during the transaction.");
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log("AJAX error: ", textStatus, errorThrown);
+                        alert("Failed to validate receiver address.");
+                    },
+                });
+            } else {
+                alert("Ethereum wallet not detected. Please install MetaMask or another compatible wallet.");
+            }
+        } catch (error) {
+            console.error("Unexpected Error: ", error);
+            alert("An unexpected error occurred. Please try again.");
+        }
+    };
+
+    function Update_data(res, amt, fromid, receiver) {
+
+        $.ajax({
+            type: "POST",
+            url: "Save_Data",
+            data: { hash: res, amt: amt, fromid: fromid, receiv: receiver },
+
+            success: onSuccess,
+            failure: function (response) {
+                document.getElementById("lblMessage").innerHTML = "Error occured..";
+            }
+        });
+
+        function onSuccess(response) {
+            if (response == "ok") {
+                var url = "/User/Topupsuccess";
+                window.open(url, '_self');
+            }
+        }
+    }
+</script>
