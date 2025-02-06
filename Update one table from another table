@@ -1,0 +1,2 @@
+UPDATE Tbl_Business_Detail SET sid = (SELECT sid FROM Tbl_Appmst WHERE Tbl_Appmst.regno = Tbl_Business_Detail.regno)
+WHERE regno IN (SELECT regno FROM Tbl_Appmst)
