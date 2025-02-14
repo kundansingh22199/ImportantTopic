@@ -1,0 +1,49 @@
+CREATE PROC SP_IncomeReport-- exec SP_IncomeReport '87654321'  
+    @regno VARCHAR(100)  
+AS  
+BEGIN  
+    -- Declare the table variable to hold dashboard details  
+    DECLARE @DashboardDetails TABLE  
+    ( userid VARCHAR(100), directbusiness DECIMAL(18, 2), name VARCHAR(100), withdraw DECIMAL(18, 2), totalearning DECIMAL(18, 2), netincome DECIMAL(18, 2),  
+      netbalance DECIMAL(18, 2), sponsorincome DECIMAL(18, 2), rankincome DECIMAL(18, 2), poolincome DECIMAL(18, 2),rankdonation DECIMAL(18,2)  
+   ,sponsordonation DECIMAL(18,2),donation DECIMAL(18,2),fromrank1 varchar(100),fromotherrank  varchar(100),totaltransfer decimal(18,2)  
+    );  
+    -- Declare variables  
+    DECLARE @UserId VARCHAR(100); DECLARE UserCursor CURSOR FOR   
+    SELECT AppMstRegNo FROM AppMst a  LEFT JOIN tbl_level_details l ON l.RegNo = a.AppMstRegNo WHERE l.TopId = @regno order by LevelNo;  
+ OPEN UserCursor;  
+    FETCH NEXT FROM UserCursor INTO @UserId;  
+  
+    WHILE @@FETCH_STATUS = 0  
+    BEGIN  
+        DECLARE @DirectBusiness DECIMAL(18, 2), @Name VARCHAR(100), @Withdraw DECIMAL(18, 2), @TotalEarning DECIMAL(18, 2), @NetBalance DECIMAL(18, 2),   
+                @SponsorIncome DECIMAL(18, 2), @RankIncome DECIMAL(18, 2), @PoolIncome DECIMAL(18, 2), @NetIncome DECIMAL(18, 2), @rankdonation DECIMAL(18, 2), @sponsordonation DECIMAL(18, 2),  
+    @fromrank1 varchar(100),@fromotherrank varchar(100),@donation decimal(18,2),@TotalTransfer decimal(18,2);  
+  select @TotalTransfer=isnull(sum(Amount),0) from Tbl_Transfer where From_Id=@UserId and Type=1   
+        SELECT @DirectBusiness = ISNULL(SUM(jointype), 0) FROM AppMst WITH (NOLOCK) WHERE sponsorid = @UserId;  
+        SELECT @Name = appmstfname FROM AppMst WITH (NOLOCK) WHERE AppMstRegNo = @UserId;  
+        SELECT @PoolIncome = ISNULL(SUM(Income), 0) FROM tbl_pool_income_one WITH (NOLOCK) WHERE RegNo = @UserId;  
+        SELECT @SponsorIncome = ISNULL(SUM(income), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9) AND rank = 1;  
+        SELECT @RankIncome = ISNULL(SUM(income), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9) AND rank != 1;  
+        SELECT @NetIncome = ISNULL(SUM(nettamt), 0) FROM tbl_pool_income_one WITH (NOLOCK) WHERE RegNo = @UserId;  
+        SELECT @NetIncome += ISNULL(SUM(incfund), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9);  
+        SELECT @Withdraw = ISNULL(SUM(amount), 0) FROM tbl_ewallet WITH (NOLOCK) WHERE regno = @UserId AND active < 2;  
+  
+  SELECT @sponsordonation = ISNULL(SUM(donation), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9) AND rank = 1;  
+        SELECT @rankdonation = ISNULL(SUM(donation), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9) AND rank != 1;  
+  SELECT @donation = ISNULL(SUM(donation), 0) FROM tbl_fund_manage WITH (NOLOCK) WHERE LEFT(mainid, 9) = LEFT(@UserId, 9)  
+        SET @TotalEarning = @SponsorIncome + @RankIncome + @PoolIncome;  
+        --SET @Balance = @TotalEarning - (@Withdraw+@TotalTransfer);  
+        SET @NetBalance = @NetIncome - (@Withdraw+@TotalTransfer);  
+  set @fromrank1 = 'Rank1 : ' + Cast(@SponsorIncome as varchar(100));  
+  set @fromotherrank = 'Other Rank : ' + Cast(@RankIncome as varchar(100));  
+        INSERT INTO @DashboardDetails VALUES   
+        (@UserId, @DirectBusiness, @Name, @Withdraw, @TotalEarning, @NetIncome, @NetBalance, @SponsorIncome, @RankIncome, @PoolIncome,@rankdonation,@sponsordonation,@donation,@fromrank1,@fromotherrank,@TotalTransfer  
+        );  
+        FETCH NEXT FROM UserCursor INTO @UserId;  
+    END;  
+  
+    CLOSE UserCursor;  
+    DEALLOCATE UserCursor;  
+    SELECT * FROM @DashboardDetails;  
+END;
