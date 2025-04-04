@@ -1,0 +1,214 @@
+
+private readonly string apiUrl = "https://www.coinpayments.net/api.php";
+private readonly string publicKey = "76da09bfbf29e0102c36685f51ca6e3e9209409bc2eb869254ed4f5e901417a5";
+private readonly string privateKey = "84Fa6c59dc15Dde94594f5f9a4d265bbf299d755Df3A6EC22Aac5e385751bf0d";
+
+
+
+
+
+public class ModWalletTransaction
+{
+    public string? status { get; set; }
+    public string? walletaddress { get; set; }
+    public string? txn_id { get; set; }
+    public string? amount { get; set; }
+    public string? status_url { get; set; }
+    public string? checkout_url { get; set; }
+    public string? qrcode_url { get; set; }
+    public string? msg { get; set; }
+}
+public class ModCheckTransaction
+{
+    public string? status { get; set; } 
+    public string? transaction_hash { get; set; } 
+    public string? status_text { get; set; } 
+    public string? txn_id { get; set; }
+    public string? walletaddress { get; set; }
+    public string? coin { get; set; }
+    public string? amount { get; set; }
+    public string? received { get; set; }
+    public string? fee { get; set; }
+    public string? time_created { get; set; } 
+    public string? time_expires { get; set; }
+    public string? sender_ip { get; set; }
+    public string? msg { get; set; }
+}
+
+
+
+public async Task<ModWalletTransaction> CreateTransactionNew(string amount)
+{
+    var postData = new Dictionary<string, string>
+    {
+        { "cmd", "create_transaction" },
+        { "key", publicKey },
+        { "amount", amount },
+        { "currency1", "USDT.BEP20" },
+        { "currency2", "USDT.BEP20" },
+        { "success_url", "https://bitcointask.us/User/fundsuceeds" },
+        { "cancel_url", "" },
+        { "buyer_email", "default@example.com" },
+        { "version", "1" },
+        { "format", "json" }
+    };
+
+    using (HttpClient client = new HttpClient())
+    {
+        // Step 1: Convert Dictionary to FormUrlEncodedContent
+        var content = new FormUrlEncodedContent(postData);
+        string postDataString = await content.ReadAsStringAsync(); // RAW BODY
+
+        // Step 2: Generate Correct HMAC Signature using RAW POST Body
+        string hmacSignature;
+        using (var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(privateKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(postDataString));
+            hmacSignature = BitConverter.ToString(hash).Replace("-", "").ToLower();
+        }
+
+        // Step 3: Add Required Headers
+        client.DefaultRequestHeaders.Add("HMAC", hmacSignature);
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        try
+        {
+            // Step 4: Send the Request
+            HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"Raw API Response: {responseBody}"); // Debugging output
+
+            // Step 5: Parse JSON Response
+            try
+            {
+                JObject jobj = JObject.Parse(responseBody);
+
+                if (jobj["error"]?.ToString() == "ok")
+                {
+                    var transaction = jobj["result"];
+                    return new ModWalletTransaction
+                    {
+                        status = "success",
+                        amount = transaction["amount"]?.ToString(),
+                        txn_id = transaction["txn_id"]?.ToString(),
+                        walletaddress = transaction["address"]?.ToString(),
+                        status_url = transaction["status_url"]?.ToString(),
+                        checkout_url = transaction["checkout_url"]?.ToString(),
+                        qrcode_url = transaction["qrcode_url"]?.ToString(),
+                        msg = "Transaction created successfully"
+                    };
+                }
+                else
+                {
+                    return new ModWalletTransaction
+                    {
+                        status = "failed",
+                        msg = jobj["error"]?.ToString() ?? "Unknown error occurred"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ModWalletTransaction
+                {
+                    status = "error",
+                    msg = $"Failed to parse API response: {ex.Message}"
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new ModWalletTransaction
+            {
+                status = "error",
+                msg = $"An unexpected error occurred: {ex.Message}"
+            };
+        }
+    }
+}
+
+public async Task<ModCheckTransaction> CheckTransactionStatus(string txn_id)
+{
+    var postData = new Dictionary<string, string>
+    {
+        { "cmd", "get_tx_info" },
+        { "key", publicKey },
+        { "txid", txn_id },
+        { "version", "1" },
+        { "format", "json" }
+    };
+
+    using (HttpClient client = new HttpClient())
+    {
+        var content = new FormUrlEncodedContent(postData);
+        string postDataString = await content.ReadAsStringAsync();
+
+        string hmacSignature;
+        using (var hmac = new HMACSHA512(Encoding.UTF8.GetBytes(privateKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(postDataString));
+            hmacSignature = BitConverter.ToString(hash).Replace("-", "").ToLower();
+        }
+
+        client.DefaultRequestHeaders.Add("HMAC", hmacSignature);
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        try
+        {
+            HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+            string responseBody = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Payment Status Response: {responseBody}");
+
+            JObject jobj = JObject.Parse(responseBody);
+            var transaction = jobj["result"];
+
+            return new ModCheckTransaction
+            {
+                status = transaction["status"]?.ToString(),
+                transaction_hash = transaction["send_tx"]?.ToString(),
+                status_text = transaction["status_text"]?.ToString(),
+                txn_id = txn_id,
+                walletaddress = transaction["payment_address"]?.ToString(),
+                coin = transaction["coin"]?.ToString(),
+                amount = transaction["amountf"]?.ToString(),
+                received = transaction["receivedf"]?.ToString(),
+                fee = transaction["fee"]?.ToString(),
+                time_created = transaction["time_created"]?.ToString(),
+                time_expires = transaction["time_expires"]?.ToString(),
+                sender_ip = transaction["sender_ip"]?.ToString(),
+                msg = "Transaction status retrieved successfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ModCheckTransaction
+            {
+                status = "error",
+                msg = $"Error checking status: {ex.Message}"
+            };
+        }
+    }
+}
+
+
+
+
+ModWalletTransaction obj = new ModWalletTransaction();
+obj = await CreateTransactionNew("0.1");
+if (obj.status == "success" && !string.IsNullOrEmpty(obj.checkout_url))
+{
+    if (await _contract.holdaddress(regno, obj.txn_id))
+    {
+        return Redirect(obj.checkout_url);
+    }
+}
+else
+{
+    ViewBag.Message = obj.msg;
+    return View("Error");
+}
+ModCheckTransaction tobj = new ModCheckTransaction();
+tobj = await CheckTransactionStatus("CPJD5AAOVBUQOEFVGK0NWEE5QM");
+
+
