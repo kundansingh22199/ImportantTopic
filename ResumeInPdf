@@ -12,76 +12,74 @@ class Program
 
         using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            Document doc = new Document(PageSize.A4, 40, 40, 40, 40); // margins
+            Document doc = new Document(PageSize.A4, 50f, 50f, 50f, 50f);
             PdfWriter.GetInstance(doc, fs);
             doc.Open();
 
-            // Define Times New Roman fonts
-            Font nameFont = FontFactory.GetFont("Times-Roman", 16, Font.BOLD);
-            Font titleFont = FontFactory.GetFont("Times-Roman", 11, Font.ITALIC);
-            Font contactFont = FontFactory.GetFont("Times-Roman", 10);
-            Font sectionFont = FontFactory.GetFont("Times-Roman", 12, Font.BOLD);
-            Font textFont = FontFactory.GetFont("Times-Roman", 10);
+            // === Fonts ===
+            var headingFont = FontFactory.GetFont("Times-Roman", 13f, Font.BOLD);
+            var nameFont = FontFactory.GetFont("Times-Roman", 20f, Font.BOLD);
+            var roleFont = FontFactory.GetFont("Times-Roman", 12f, Font.ITALIC);
+            var contactFont = FontFactory.GetFont("Times-Roman", 11f);
+            var contentFont = FontFactory.GetFont("Times-Roman", 11f);
+            var lineGap = 6f;
 
-            // === HEADER ===
-            Paragraph name = new Paragraph("KUNDAN KUMAR", nameFont)
-            {
-                Alignment = Element.ALIGN_CENTER,
-                SpacingAfter = 2f
-            };
-            doc.Add(name);
+            // === Header ===
+            AddCenteredParagraph(doc, "KUNDAN KUMAR", nameFont, spacingAfter: 2f);
+            AddCenteredParagraph(doc, "Dotnet Developer", roleFont, spacingAfter: 2f);
+            AddCenteredParagraph(doc, "Phone: +91 9798501225 | Email: kundanmth01@gmail.com", contactFont, spacingAfter: 12f);
 
-            Paragraph designation = new Paragraph("Dotnet Developer", titleFont)
-            {
-                Alignment = Element.ALIGN_CENTER,
-                SpacingAfter = 2f
-            };
-            doc.Add(designation);
+            // === Professional Summary ===
+            AddSection(doc, "Professional Summary", headingFont,
+                "Motivated and quick-learning IT professional with strong interpersonal skills and a proven ability to develop robust software solutions. Experienced in full-stack .NET development, API integration, and database management. Seeking to contribute my expertise to dynamic software development teams in enterprise environments.",
+                contentFont, lineGap);
 
-            Paragraph contact = new Paragraph("📞 +91 9798501225 | 📧 kundanmth01@gmail.com", contactFont)
-            {
-                Alignment = Element.ALIGN_CENTER,
-                SpacingAfter = 10f
-            };
-            doc.Add(contact);
+            // === Technical Skills ===
+            AddSection(doc, "Technical Skills", headingFont,
+                "• C#, .NET, .NET Core, ASP.NET MVC\n" +
+                "• Web API, JavaScript, jQuery, HTML, CSS, Bootstrap\n" +
+                "• SQL Server, LINQ\n" +
+                "• Tools: Visual Studio, Git, Postman\n" +
+                "• Platforms: Windows, IIS",
+                contentFont, lineGap);
 
-            // === SECTIONS ===
-
-            AddSection(doc, "CAREER OBJECTIVE", sectionFont, textFont, "Motivated and quick-learning IT professional with strong interpersonal skills, dedicated to building and maintaining productive client relationships. Proven problem-solver with experience in resolving technical issues and driving results. Seeking opportunities to apply my technical expertise and grow professionally.");
-
-            AddSection(doc, "EXPERIENCE", sectionFont, textFont,
+            // === Experience ===
+            AddSection(doc, "Professional Experience", headingFont,
                 "MNB Soft Solution — Jan 2024 – Present\n" +
-                "• Proficient in API design and development using C#, .NET, and .NET Core.\n" +
-                "• Strong knowledge of SQL for effective database management.\n" +
-                "• Integrated payment gateways (CCAvenue, CoinsPay).\n\n" +
+                "• Developed REST APIs using .NET Core and C#.\n" +
+                "• Integrated payment gateways like CCAvenue and CoinsPay.\n" +
+                "• Worked with SQL Server and optimized DB queries.\n\n" +
                 "WTS Net India Pvt. Ltd. — Jan 2023 – Jan 2024\n" +
-                "• Designed ASP.NET MVC Core apps with C# and SQL Server.\n" +
-                "• Reviewed code and collaborated with dev teams.");
+                "• Designed and developed MVC applications.\n" +
+                "• Improved app performance and collaborated with dev teams.",
+                contentFont, lineGap);
 
-            AddSection(doc, "EDUCATION", sectionFont, textFont,
-                "• MCA - IGNOU\n" +
-                "• BCA - IGNOU (2020)");
+            // === Education ===
+            AddSection(doc, "Education", headingFont,
+                "• MCA – Indira Gandhi National Open University\n" +
+                "• BCA – Indira Gandhi National Open University (2020)",
+                contentFont, lineGap);
 
-            AddSection(doc, "TECHNICAL SKILLS", sectionFont, textFont,
-                "• C#, .NET, .NET Core, Web API, jQuery, HTML, CSS\n" +
-                "• SQL Server\n" +
-                "• Languages: English, Hindi");
-
-            AddSection(doc, "SOFT SKILLS", sectionFont, textFont,
-                "Leadership, Teamwork, Creativity, Adaptability, Time Management, Decision Making");
-
-            AddSection(doc, "PROJECTS", sectionFont, textFont,
+            // === Projects ===
+            AddSection(doc, "Projects", headingFont,
                 "• Mparchi – https://mparchi.com\n" +
                 "• NvShoppe – https://nvshoppe.com\n" +
                 "• MnbPromo – https://mnbpromo.com\n" +
-                "• MLM Softwares");
+                "• MLM Software Solutions",
+                contentFont, lineGap);
+
+            // === Languages ===
+            AddSection(doc, "Languages", headingFont,
+                "• English – Professional Proficiency\n" +
+                "• Hindi – Native Proficiency",
+                contentFont, lineGap);
 
             doc.Close();
         }
 
-        Console.WriteLine("✅ PDF Created Successfully at: " + path);
+        Console.WriteLine("✅ Resume PDF Generated Successfully at: " + path);
 
-        // Open PDF
+        // Auto open the file
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
         {
             FileName = path,
@@ -89,19 +87,31 @@ class Program
         });
     }
 
-    static void AddSection(Document doc, string title, Font titleFont, Font bodyFont, string bodyText)
+    // Utility: Centered Paragraph
+    static void AddCenteredParagraph(Document doc, string text, Font font, float spacingAfter = 5f)
     {
-        Paragraph header = new Paragraph(title, titleFont)
+        Paragraph p = new Paragraph(text, font)
+        {
+            Alignment = Element.ALIGN_CENTER,
+            SpacingAfter = spacingAfter
+        };
+        doc.Add(p);
+    }
+
+    // Utility: Section with title and content
+    static void AddSection(Document doc, string title, Font titleFont, string content, Font contentFont, float spacing)
+    {
+        Paragraph titlePara = new Paragraph(title, titleFont)
         {
             SpacingBefore = 10f,
-            SpacingAfter = 3f
+            SpacingAfter = 4f
         };
-        doc.Add(header);
+        doc.Add(titlePara);
 
-        Paragraph body = new Paragraph(bodyText, bodyFont)
+        Paragraph contentPara = new Paragraph(content, contentFont)
         {
-            SpacingAfter = 10f
+            SpacingAfter = spacing
         };
-        doc.Add(body);
+        doc.Add(contentPara);
     }
 }
