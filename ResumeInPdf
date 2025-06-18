@@ -1,0 +1,107 @@
+using System;
+using System.IO;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+
+class Program
+{
+    static void Main()
+    {
+        string fileName = "Kundan_Kumar_Resume.pdf";
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+
+        using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            Document doc = new Document(PageSize.A4, 40, 40, 40, 40); // margins
+            PdfWriter.GetInstance(doc, fs);
+            doc.Open();
+
+            // Define Times New Roman fonts
+            Font nameFont = FontFactory.GetFont("Times-Roman", 16, Font.BOLD);
+            Font titleFont = FontFactory.GetFont("Times-Roman", 11, Font.ITALIC);
+            Font contactFont = FontFactory.GetFont("Times-Roman", 10);
+            Font sectionFont = FontFactory.GetFont("Times-Roman", 12, Font.BOLD);
+            Font textFont = FontFactory.GetFont("Times-Roman", 10);
+
+            // === HEADER ===
+            Paragraph name = new Paragraph("KUNDAN KUMAR", nameFont)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 2f
+            };
+            doc.Add(name);
+
+            Paragraph designation = new Paragraph("Dotnet Developer", titleFont)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 2f
+            };
+            doc.Add(designation);
+
+            Paragraph contact = new Paragraph("📞 +91 9798501225 | 📧 kundanmth01@gmail.com", contactFont)
+            {
+                Alignment = Element.ALIGN_CENTER,
+                SpacingAfter = 10f
+            };
+            doc.Add(contact);
+
+            // === SECTIONS ===
+
+            AddSection(doc, "CAREER OBJECTIVE", sectionFont, textFont, "Motivated and quick-learning IT professional with strong interpersonal skills, dedicated to building and maintaining productive client relationships. Proven problem-solver with experience in resolving technical issues and driving results. Seeking opportunities to apply my technical expertise and grow professionally.");
+
+            AddSection(doc, "EXPERIENCE", sectionFont, textFont,
+                "MNB Soft Solution — Jan 2024 – Present\n" +
+                "• Proficient in API design and development using C#, .NET, and .NET Core.\n" +
+                "• Strong knowledge of SQL for effective database management.\n" +
+                "• Integrated payment gateways (CCAvenue, CoinsPay).\n\n" +
+                "WTS Net India Pvt. Ltd. — Jan 2023 – Jan 2024\n" +
+                "• Designed ASP.NET MVC Core apps with C# and SQL Server.\n" +
+                "• Reviewed code and collaborated with dev teams.");
+
+            AddSection(doc, "EDUCATION", sectionFont, textFont,
+                "• MCA - IGNOU\n" +
+                "• BCA - IGNOU (2020)");
+
+            AddSection(doc, "TECHNICAL SKILLS", sectionFont, textFont,
+                "• C#, .NET, .NET Core, Web API, jQuery, HTML, CSS\n" +
+                "• SQL Server\n" +
+                "• Languages: English, Hindi");
+
+            AddSection(doc, "SOFT SKILLS", sectionFont, textFont,
+                "Leadership, Teamwork, Creativity, Adaptability, Time Management, Decision Making");
+
+            AddSection(doc, "PROJECTS", sectionFont, textFont,
+                "• Mparchi – https://mparchi.com\n" +
+                "• NvShoppe – https://nvshoppe.com\n" +
+                "• MnbPromo – https://mnbpromo.com\n" +
+                "• MLM Softwares");
+
+            doc.Close();
+        }
+
+        Console.WriteLine("✅ PDF Created Successfully at: " + path);
+
+        // Open PDF
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = path,
+            UseShellExecute = true
+        });
+    }
+
+    static void AddSection(Document doc, string title, Font titleFont, Font bodyFont, string bodyText)
+    {
+        Paragraph header = new Paragraph(title, titleFont)
+        {
+            SpacingBefore = 10f,
+            SpacingAfter = 3f
+        };
+        doc.Add(header);
+
+        Paragraph body = new Paragraph(bodyText, bodyFont)
+        {
+            SpacingAfter = 10f
+        };
+        doc.Add(body);
+    }
+}
