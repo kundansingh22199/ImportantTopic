@@ -1,0 +1,609 @@
+--------------------------AppSettings---------------------------
+"PhonePe1": {
+  "ClientId": "M23GCME4YWJVQ_2512241525",
+  "ClientSecret": "YTdhM2NjMGUtNDI3Yy00ZTEzLWFhYWItMDI2ODQwNzkxNTc0",
+  "ClientVersion": "1",
+  "BaseUrl": "https://api-preprod.phonepe.com/apis/pg-sandbox/apis/pg-sandbox",
+  "RedirectUrl": "https://nv.mnbsoft.in/api/payment/response",
+  "CallbackUrl": "https://nv.mnbsoft.in/api/payment/response"
+},
+"PhonePe": {
+  "ClientId": "SU2511251940318940941195",
+  "ClientSecret": "8078860c-be32-4518-ac93-9d42d8620ae3",
+  "ClientVersion": "1",
+  "BaseUrl": "https://api.phonepe.com/apis/pg",
+  "RedirectUrl": "https://nv.mnbsoft.in/api/payment/response",
+  "CallbackUrl": "https://nv.mnbsoft.in/api/payment/response"
+}
+---------------------Controller Code---------------------------
+[ApiController]
+[Route("api/payment")]
+[EnableCors("*")]
+public class PhonePeController : ControllerBase
+{
+    private readonly IConfiguration _config;
+    private readonly IContract _icontract;
+
+    public PhonePeController(IConfiguration config, IContract contract)
+    {
+        _config = config;
+        _icontract = contract;
+    }
+    public string CheckValidateUser()
+    {
+        string username = "";
+        var headers = Request.Headers;
+        if (headers.ContainsKey("X-Auth-Token"))
+        {
+            string token = headers["X-Auth-Token"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(token))
+            {
+                username = TokenManager.ValidateToken(token);
+            }
+        }
+        if (string.IsNullOrEmpty(username))
+        {
+            return "Invalid token or user not found.";
+        }
+        return username;
+    }
+    private async Task<string> GetToken()
+    {
+        //var client = new RestClient($"{_config["PhonePe:BaseUrl"]}/v1/oauth/token");
+        //var client = new RestClient("https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token");
+        var client = new RestClient("https://api.phonepe.com/apis/identity-manager/v1/oauth/token");
+
+        var request = new RestRequest();
+        request.Method = Method.Post;
+
+        request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.AddParameter("client_id", _config["PhonePe:ClientId"]);
+        request.AddParameter("client_secret", _config["PhonePe:ClientSecret"]);
+        request.AddParameter("grant_type", "client_credentials");
+        request.AddParameter("client_version", _config["PhonePe:ClientVersion"]);
+
+        var response = await client.ExecuteAsync(request);
+
+        if (!response.IsSuccessful)
+            throw new Exception(response.Content);
+
+        dynamic obj = JsonConvert.DeserializeObject(response.Content);
+        return obj.access_token;
+    }
+
+    [HttpPost("create-payment")]
+    public async Task<IActionResult> CreatePayment(ModAmt obj)
+    {
+        string uid = CheckValidateUser();
+        if (string.IsNullOrEmpty(uid) || uid == "Invalid token or user not found.")
+        {
+            return Unauthorized(new
+            {
+                Status = "Error",
+                Message = "Access Denied"
+            });
+        }
+
+        decimal amount = 0;
+        amount = (obj.quantity * obj.value) + (obj.quantity * obj.value) * 2 / 100;
+        var token = await GetToken();
+        var merchantOrderId = Guid.NewGuid().ToString("N");
+
+        //var client = new RestClient($"{_config["PhonePe:BaseUrl"]}/v1/pay");
+        //var client = new RestClient("https://api-preprod.phonepe.com/apis/pg-sandbox/checkout/v2/pay");
+        var client = new RestClient("https://api.phonepe.com/apis/pg/checkout/v2/pay");
+
+        var request = new RestRequest();
+        request.Method = Method.Post;
+
+        request.AddHeader("Content-Type", "application/json");
+        request.AddHeader("Authorization", $"O-Bearer {token}");
+        var redirectUrl = $"{_config["PhonePe:RedirectUrl"]}?merchantOrderId={merchantOrderId}";
+        var body = new
+        {
+            merchantOrderId = merchantOrderId,
+            amount = (long)(amount * 100),
+            expireAfter = 300,
+            metaInfo = new { udf1 = "test" },
+            paymentFlow = new
+            {
+                type = "PG_CHECKOUT",
+                message = "Payment",
+                merchantUrls = new
+                {
+                    redirectUrl = redirectUrl,
+                    callbackUrl = _config["PhonePe:CallbackUrl"]
+                }
+            }
+        };
+
+        request.AddJsonBody(body);
+        var response = await client.ExecuteAsync(request);
+
+        if (!response.IsSuccessful || string.IsNullOrEmpty(response.Content))
+        {
+            return BadRequest(new
+            {
+                Status = "Failed",
+                Message = "PhonePe API error",
+                Error = response.Content
+            });
+        }
+
+        dynamic result = JsonConvert.DeserializeObject(response.Content);
+        ModPhonePay objphone = new ModPhonePay();
+        objphone.RegNo = uid;
+        objphone.Quantity = obj.quantity;
+        objphone.PinValue = obj.value;
+        objphone.TotalValue = (obj.quantity * obj.value);
+        objphone.PayableAmount = amount;
+        objphone.MerchantOrderId = merchantOrderId;
+        objphone.TransactionId = result.orderId;
+        objphone.Status = result.state;
+        objphone.Action = "insert";
+
+        await _icontract.PhonePayTransaction(objphone);
+        return Ok(new
+        {
+            Status = "Success",
+            Message = "Payment initiated successfully",
+            MerchantOrderId = merchantOrderId,
+            Payload = result
+        });
+    }
+
+    [HttpPost("callback")]
+    public async Task<IActionResult> PaymentCallback([FromBody] dynamic payload)
+    {
+        try
+        {
+            string rawBody = payload?.ToString();
+            if (string.IsNullOrEmpty(rawBody)) return BadRequest("Empty callback");
+
+            Console.WriteLine("Callback Raw Data: " + rawBody);
+
+            dynamic json = JsonConvert.DeserializeObject(rawBody);
+            string merchantOrderId = json?.data?.merchantOrderId;
+            if (string.IsNullOrEmpty(merchantOrderId)) return BadRequest("merchantOrderId not found");
+
+            var token = await GetToken();
+            //var client = new RestClient($"{_config["PhonePe:BaseUrl"]}/v1/order/{merchantOrderId}/status");
+            var client = new RestClient(
+            $"https://api.phonepe.com/apis/pg/checkout/v2/status/{merchantOrderId}"
+            );
+            var request = new RestRequest();
+            request.Method = Method.Get;
+            request.AddHeader("Authorization", $"O-Bearer {token}");
+
+            var response = await client.ExecuteAsync(request);
+
+            Console.WriteLine("Status Response: " + response.Content);
+
+            // TODO: Save merchantOrderId + response.Content in DB
+            return Ok(new
+            {
+                message = "Callback processed",
+                statusResponse = response.Content
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    [HttpGet("response")]
+    public async Task<IActionResult> PaymentResponse([FromQuery] string merchantOrderId)
+    {
+        ModPhonePay objphone = new ModPhonePay();
+
+        string uid = CheckValidateUser();
+        if (string.IsNullOrEmpty(uid))
+            return Unauthorized("Access Denied");
+
+        if (string.IsNullOrEmpty(merchantOrderId))
+            return BadRequest("Invalid order id");
+
+        var statusResult = await GetPaymentStatus(merchantOrderId);
+        if (statusResult == null)
+        {
+            string redirect = $"https://nvshoppe.com/user/paymet/{merchantOrderId}";
+            return Redirect(redirect);
+        }
+        //return BadRequest("Unable to fetch payment status");
+
+        string paymentStatus = statusResult.state ?? "PENDING";
+
+        objphone.RegNo = uid;
+        objphone.MerchantOrderId = merchantOrderId;
+        objphone.Status = paymentStatus;
+        objphone.PayableAmount = statusResult.payableAmount / 100m;
+        objphone.Response = JsonConvert.SerializeObject(statusResult);
+        objphone.Action = "update";
+
+        if (statusResult.paymentDetails != null && statusResult.paymentDetails.Count > 0)
+        {
+            var detail = statusResult.paymentDetails[0];
+
+            objphone.TransactionId = detail.transactionId;
+            objphone.PaymentMode = detail.paymentMode;
+
+
+            if (detail.state == "COMPLETED" && detail.splitInstruments != null && detail.splitInstruments.Count > 0)
+            {
+                var split = detail.splitInstruments[0];
+
+                objphone.UTR = split.rail?.utr;
+                objphone.UpiTransactionId = split.rail?.upiTransactionId;
+                objphone.RailType = split.rail?.type;
+                objphone.Vpa = split.rail?.vpa;
+
+                objphone.AccountType = split.instrument?.accountType;
+                objphone.AccountNumber = split.instrument?.maskedAccountNumber;
+                objphone.AccountHolderName = split.instrument?.accountHolderName;
+                objphone.IFSC = split.instrument?.ifsc;
+                objphone.BankId = split.instrument?.bankId;
+            }
+            else
+            {
+                objphone.UTR = null;
+                objphone.UpiTransactionId = null;
+                objphone.RailType = null;
+                objphone.Vpa = null;
+                objphone.AccountType = null;
+                objphone.AccountNumber = null;
+                objphone.AccountHolderName = null;
+                objphone.IFSC = null;
+                objphone.BankId = null;
+            }
+        }
+
+        await _icontract.PhonePayTransaction(objphone);
+
+        string redirectUrl = $"https://nvshoppe.com/user/paymet/{merchantOrderId}";
+        return Redirect(redirectUrl);
+    }
+    private async Task<dynamic> GetPaymentStatus(string merchantOrderId) 
+    { 
+        var token = await GetToken(); 
+        var client = new RestClient($"https://api.phonepe.com/apis/pg/checkout/v2/order/{merchantOrderId}/status"); 
+        var request = new RestRequest(); 
+        request.Method = Method.Get;
+        request.AddHeader("Authorization", $"O-Bearer {token}"); 
+        var response = await client.ExecuteAsync(request); 
+        if (!response.IsSuccessful || string.IsNullOrEmpty(response.Content)) 
+        return null; 
+        return JsonConvert.DeserializeObject<dynamic>(response.Content); 
+    }
+
+
+    [HttpGet("status/{merchantOrderId}")]
+    public async Task<IActionResult> CheckStatus(string merchantOrderId)
+    {
+        if (string.IsNullOrEmpty(merchantOrderId))
+            return BadRequest("Invalid order id");
+
+        var statusResult = await GetPaymentStatus(merchantOrderId);
+        if (statusResult == null)
+            return BadRequest("Unable to fetch payment status");
+
+        // Determine payment status
+        string paymentStatus = "PENDING";
+        if (statusResult.state != null)
+            paymentStatus = statusResult.state;
+        else if (statusResult.paymentDetails != null && statusResult.paymentDetails.Count > 0)
+            paymentStatus = statusResult.paymentDetails[0].state;
+
+        string code = statusResult.orderId ??
+        (statusResult.paymentDetails != null && statusResult.paymentDetails.Count > 0 ? statusResult.paymentDetails[0].transactionId : "");
+
+        var paymentDetails = new List<object>();
+        if (statusResult.paymentDetails != null && statusResult.paymentDetails.Count > 0)
+        {
+            foreach (var detail in statusResult.paymentDetails)
+            {
+                var splitInstruments = new List<object>();
+                if (detail.splitInstruments != null && detail.splitInstruments.Count > 0)
+                {
+                    foreach (var si in detail.splitInstruments)
+                    {
+                        splitInstruments.Add(new
+                        {
+                            amount = si.amount / 100.0m,
+                            railType = si.rail?.type,
+                            utr = si.rail?.utr,
+                            upiTransactionId = si.rail?.upiTransactionId,
+                            vpa = si.rail?.vpa,
+                            accountType = si.instrument?.accountType,
+                            maskedAccountNumber = si.instrument?.maskedAccountNumber,
+                            accountHolderName = si.instrument?.accountHolderName,
+                            ifsc = si.instrument?.ifsc,
+                            bankId = si.instrument?.bankId
+                        });
+                    }
+                }
+
+                paymentDetails.Add(new
+                {
+                    paymentMode = detail.paymentMode,
+                    transactionId = detail.transactionId,
+                    amount = detail.amount / 100.0m,
+                    payableAmount = detail.payableAmount / 100.0m,
+                    feeAmount = detail.feeAmount != null ? detail.feeAmount / 100.0m : (decimal?)null,
+                    state = detail.state,
+                    timestamp = detail.timestamp,
+                    splitInstruments
+                });
+            }
+        }
+        return Ok(new
+        {
+            message = paymentStatus,
+            orderId = merchantOrderId,
+            code,
+            status = paymentStatus,
+            //metaInfo = statusResult.metaInfo,
+            amount = statusResult.amount / 100.0m,
+            payableAmount = statusResult.payableAmount / 100.0m,
+            paymentDetails
+        });
+    }
+}
+
+-------------------------Model----------------------------
+public class ModPhonePay
+{
+    public string RegNo { get; set; }
+    public int Quantity { get; set; }
+    public decimal PinValue { get; set; }
+    public decimal TotalValue { get; set; }
+    public decimal PayableAmount { get; set; }
+
+    public string MerchantOrderId { get; set; }
+    public string TransactionId { get; set; }
+    public string PaymentMode { get; set; }
+    public string UTR { get; set; }
+    public string UpiTransactionId { get; set; }
+
+    public string RailType { get; set; }
+    public string Vpa { get; set; }
+    public string AccountType { get; set; }
+    public string AccountNumber { get; set; }
+    public string AccountHolderName { get; set; }
+    public string IFSC { get; set; }
+    public string BankId { get; set; }
+
+    public string Status { get; set; }
+    public string Response { get; set; }
+
+    public string Action { get; set; }
+}
+
+public class PhonePePaymentRequest
+{
+    public string MerchantTransactionId { get; set; }
+    public string MerchantUserId { get; set; }
+    public long Amount { get; set; } // in paise
+    public string RedirectUrl { get; set; }
+    public string RedirectMode { get; set; } = "POST";
+    public string CallbackUrl { get; set; }
+    public PaymentInstrument PaymentInstrument { get; set; }
+}
+
+public class PaymentInstrument
+{
+    public string Type { get; set; } = "PAY_PAGE";
+}
+public class ModAmt
+{
+    public int quantity { get; set; }
+    public decimal value { get; set; }
+    public string? remark { get; set; }
+}
+-------------------------------Token Manager-----------------------------
+public static class TokenManager
+{
+    private static readonly string Secret = "ERMN05OPLoDvbTTa/QkqLNMI7cPLguaRyHdgfsxaszzyg7n5qNBVjQmtBhz4SzYh4NBVCXi3KJHlSXKP+dasdaoi2+bXr6CUYTR==";
+    private static readonly string Issuer = "https://localhost:44376/";
+    private static readonly string Audience = "https://localhost:44376/";
+
+    public static string GenerateToken(string username)
+    {
+        var key = Encoding.ASCII.GetBytes(Secret);
+        var securityKey = new SymmetricSecurityKey(key);
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }),
+            Expires = DateTime.UtcNow.AddMinutes(180),
+            Issuer = Issuer,
+            Audience = Audience,
+            SigningCredentials = credentials
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return tokenHandler.WriteToken(token);
+    }
+    public static ClaimsPrincipal GetPrincipal(string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(Secret);
+
+            var parameters = new TokenValidationParameters
+            {
+                RequireExpirationTime = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = Issuer,
+                ValidAudience = Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, parameters, out securityToken);
+
+            return principal;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    public static string ValidateToken(string token)
+    {
+        var principal = GetPrincipal(token);
+        if (principal == null)
+            return null;
+
+        var identity = principal.Identity as ClaimsIdentity;
+        var usernameClaim = identity?.FindFirst(ClaimTypes.Name);
+
+        return usernameClaim?.Value;
+    }
+}
+
+
+----------------------Class DB-------------------------
+public async Task<bool> PhonePayTransaction(ModPhonePay mod)
+{
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(_con.GetConnectionString()))
+        {
+            using (SqlCommand cmd = new SqlCommand("SP_AddPhonePayTransaction", connection))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@regno", mod.RegNo);
+                cmd.Parameters.AddWithValue("@Quantity", mod.Quantity);
+                cmd.Parameters.AddWithValue("@PinValue", mod.PinValue);
+                cmd.Parameters.AddWithValue("@TotalValue", mod.TotalValue);
+                cmd.Parameters.AddWithValue("@PayableAmount", mod.PayableAmount);
+                cmd.Parameters.AddWithValue("@merchantOrderId", mod.MerchantOrderId);
+                cmd.Parameters.AddWithValue("@transactionId", mod.TransactionId);
+                cmd.Parameters.AddWithValue("@paymentMode", mod.PaymentMode);
+                cmd.Parameters.AddWithValue("@utr", mod.UTR);
+                cmd.Parameters.AddWithValue("@upiTransactionId", mod.UpiTransactionId);
+                cmd.Parameters.AddWithValue("@railType", mod.RailType);
+                cmd.Parameters.AddWithValue("@vpa", mod.Vpa);
+                cmd.Parameters.AddWithValue("@accountType", mod.AccountType);
+                cmd.Parameters.AddWithValue("@accountNumber", mod.AccountNumber);
+                cmd.Parameters.AddWithValue("@accountHolderName", mod.AccountHolderName);
+                cmd.Parameters.AddWithValue("@ifsc", mod.IFSC);
+                cmd.Parameters.AddWithValue("@bankId", mod.BankId);
+                cmd.Parameters.AddWithValue("@status", mod.Status);
+                cmd.Parameters.AddWithValue("@response", mod.Response);
+                cmd.Parameters.AddWithValue("@action", mod.Action);
+                connection.Open();
+                int result = cmd.ExecuteNonQuery();
+                return result > 0;
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+
+        throw;
+    }
+    
+}
+
+
+----------------Procedure----------------------
+CREATE Proc SP_AddPhonePayTransaction  
+@regno varchar(100)=null,  
+@Quantity int,  
+@PinValue decimal(18,2),   
+@TotalValue decimal(18,2),  
+@PayableAmount decimal(18,2),  
+@merchantOrderId varchar(200),  
+@transactionId varchar(200)=null,  
+@paymentMode varchar(100)=null,  
+@utr varchar(100)=null,  
+@upiTransactionId varchar(200)=null,  
+@railType varchar(100)=null,  
+@vpa varchar(100)=null,  
+@accountType varchar(100)=null,  
+@accountNumber varchar(100)=null,  
+@accountHolderName varchar(200)=null,  
+@ifsc varchar(100)=null,  
+@bankId varchar(100)=null,  
+@status varchar(100)=null,  
+@response varchar(max)=null,  
+@action varchar(100)  
+AS  
+BEGIN  
+ IF(@action='insert')  
+ BEGIN  
+  INSERT INTO Tbl_PhonePayTransaction(regno,Quantity,PinValue,TotalValue,PayableAmount,merchantOrderId,transactionId,paymentMode,utr,upiTransactionId,  
+  railType,vpa,accountType,accountNumber,accountHolderName,ifsc,bankId,status,createDate,updateDate,response)  VALUES (@regno,@Quantity,@PinValue,  
+  @TotalValue,@PayableAmount,@merchantOrderId,@transactionId,@paymentMode,@utr,@upiTransactionId,@railType,@vpa,@accountType,@accountNumber,@accountHolderName,  
+  @ifsc,@bankId,@status,(DATEADD(minute,(0),DATEADD(hour,(1),getutcdate()))),(DATEADD(minute,(0),DATEADD(hour,(1),getutcdate()))),@response)  
+ END  
+ IF(@action='update')  
+ BEGIN  
+  UPDATE Tbl_PhonePayTransaction SET PayableAmount = @PayableAmount,transactionId = @transactionId, paymentMode = @paymentMode, utr = @utr, upiTransactionId = @upiTransactionId,  
+        railType = @railType, vpa = @vpa, accountType = @accountType, accountNumber = @accountNumber, accountHolderName = @accountHolderName,  
+        ifsc = @ifsc, bankId = @bankId, status = @status, response = @response, updateDate = (DATEADD(minute,(0),DATEADD(hour,(1),getutcdate())))  
+        WHERE merchantOrderId = @merchantOrderId;  
+  IF(@status = 'COMPLETED')  
+  BEGIN  
+   IF NOT EXISTS (SELECT 1 from PinMst where merchantOrderId=@merchantOrderId)  
+   BEGIN  
+    DECLARE @i INT = 1,@PinNo VARCHAR(10),@PinPass VARCHAR(4),@chars VARCHAR(50) = 'ABCDEFGHJKMNPQRSTUVWXYZ123456789',@PinSrNo int=0;  
+    select top 1 @regno=regno,@Quantity=Quantity,@PinValue=PinValue from Tbl_PhonePayTransaction where merchantOrderId=@merchantOrderId order by id desc  
+    WHILE @i <= @Quantity  
+    BEGIN  
+     SET @PinSrNo=0  
+     SELECT @PinSrNo=ISNULL(MAX(PinSrNo),0)+1 FROM PinMst  
+     SET @PinNo = ''  
+     WHILE LEN(@PinNo) < 10  
+      SET @PinNo = @PinNo + SUBSTRING(@chars, ABS(CHECKSUM(NEWID())) % LEN(@chars) + 1, 1)  
+     IF EXISTS (SELECT 1 FROM PINMST WHERE PinNo = @PinNo)  
+      CONTINUE  
+  
+     -- Generate 4 digit password  
+     SET @PinPass = ''  
+     WHILE LEN(@PinPass) < 4  
+      SET @PinPass = @PinPass + SUBSTRING(@chars, ABS(CHECKSUM(NEWID())) % LEN(@chars) + 1, 1)  
+  
+     INSERT INTO PINMST(isactivate,PinSrNo, PinNo,PinPassword,paidAppMstId,Joinfor,Category,SenderID,totalpins,lastno,  
+     updateid,generatedate,remark,merchantOrderId)VALUES(1,@PinSrNo,@PinNo,@PinPass,0,@PinValue,5,@regno,@Quantity,0,  
+     @regno,(DATEADD(minute,(0),DATEADD(hour,(1),getutcdate()))),'PhonePe Auto Generated',@merchantOrderId)  
+    SET @i = @i + 1  
+    END  
+   END  
+  END  
+ END  
+END
+
+----------------------Table---------------------------
+CREATE TABLE [dbo].[Tbl_PhonePayTransaction](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[regno] [varchar](100) NULL,
+	[Quantity] [int] NULL,
+	[PinValue] [decimal](18, 2) NULL,
+	[TotalValue] [decimal](18, 2) NULL,
+	[PayableAmount] [decimal](18, 2) NULL,
+	[merchantOrderId] [varchar](200) NULL,
+	[transactionId] [varchar](200) NULL,
+	[paymentMode] [varchar](100) NULL,
+	[utr] [varchar](100) NULL,
+	[upiTransactionId] [varchar](200) NULL,
+	[railType] [varchar](100) NULL,
+	[vpa] [varchar](100) NULL,
+	[accountType] [varchar](100) NULL,
+	[accountNumber] [varchar](100) NULL,
+	[accountHolderName] [varchar](200) NULL,
+	[ifsc] [varchar](100) NULL,
+	[bankId] [varchar](100) NULL,
+	[status] [varchar](100) NULL,
+	[createDate] [datetime] NULL,
+	[updateDate] [datetime] NULL,
+	[response] [varchar](max) NULL
+)
