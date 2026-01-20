@@ -1,3 +1,47 @@
+---------------------Cors-------------------
+builder.Services.AddCors();
+app.UseCorsMiddleware();
+app.UseCors();
+
+
+
+public class CorsMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public CorsMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task Invoke(HttpContext httpContext)
+    {
+        if (httpContext.Request.Method == HttpMethods.Options)
+        {
+            httpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            httpContext.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+            httpContext.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, X-File-Name,X-Auth-Token");
+            httpContext.Response.Headers.Add("Access-Control-Allow-Methods", "*");
+            httpContext.Response.StatusCode = StatusCodes.Status204NoContent;
+            return;
+        }
+
+        httpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        httpContext.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
+        httpContext.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version, X-File-Name,X-Auth-Token");
+        httpContext.Response.Headers.Add("Access-Control-Allow-Methods", "*");
+
+        await _next(httpContext);
+    }
+}
+
+public static class CorsMiddlewareExtensions
+{
+    public static IApplicationBuilder UseCorsMiddleware(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware<CorsMiddleware>();
+    }
+}
 --------------------------AppSettings---------------------------
 "PhonePe1": {
   "ClientId": "M23GCME4YWJVQ_2512241525",
