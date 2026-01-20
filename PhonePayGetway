@@ -60,6 +60,18 @@ public static class CorsMiddlewareExtensions
   "CallbackUrl": "https://nv.mnbsoft.in/api/payment/response"
 }
 ---------------------Controller Code---------------------------
+using BusinessEntity;
+using DataAccessLayer;
+using InterfaceLibrary;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
+using Newtonsoft.Json;
+using NvShoppeCoreMvcApi.Controllers;
+using RestSharp;
+using System.Security.Cryptography;
+using System.Text;
+
 [ApiController]
 [Route("api/payment")]
 [EnableCors("*")]
