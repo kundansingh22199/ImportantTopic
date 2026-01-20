@@ -1,0 +1,884 @@
+---------------------------------Web Config------------------------
+<appSettings>
+  <add key="webpages:Version" value="3.0.0.0" />
+  <add key="webpages:Enabled" value="false" />
+  <add key="ClientValidationEnabled" value="true" />
+  <add key="UnobtrusiveJavaScriptEnabled" value="true" />
+ <add key="CcAvenueMerchantId" value="3055140" />
+ <add key="CcAvenueWorkingKey" value="7EAA4EF2E0F1992BE5FE8584F0F405A9" />
+ <add key="CcAvenueAccessCode" value="AVHJ03LG66AW49JHWA" />
+ <add key="CcAvenueCheckoutUrl" value="https://secure.ccavenue.com/transaction/transaction.do?command=initiateTransaction" />
+</appSettings>
+
+---------------------------------Controller------------------------
+using Antlr.Runtime.Misc;
+using CCA.Util;
+using MnbebookApi.Classfile;
+using MnbebookApi.ClassFiles;
+using MnbebookApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Numerics;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Helpers;
+using System.Web.Http;
+using System.Web.UI.WebControls;
+using System.Xml.Linq;
+using static System.Net.WebRequestMethods;
+
+[RoutePrefix("api")]
+public class PaymentController : ApiController
+{
+    private readonly Dal _dal;
+    private readonly string _accessCode;
+    private readonly string _checkoutUrl;
+    private readonly string _workingKey;
+    private readonly string _merchantId;
+    public PaymentController()
+    {
+        _dal = new Dal();
+        _accessCode = ConfigurationManager.AppSettings["CcAvenueAccessCode"];
+        _checkoutUrl = ConfigurationManager.AppSettings["CcAvenueCheckoutUrl"];
+        _workingKey = ConfigurationManager.AppSettings["CcAvenueWorkingKey"];
+        _merchantId = ConfigurationManager.AppSettings["CcAvenueMerchantId"];
+    }
+   
+    public string checkvalidate_user()
+    {
+        string userid = "";
+        System.Net.Http.Headers.HttpRequestHeaders headers = this.Request.Headers;
+        string uId = "";
+        if (headers.Contains("X-Auth-Token"))
+        {
+            userid = TokenManager.ValidateToken(uId = headers.GetValues("X-Auth-Token").First());
+        }
+        return userid;
+    }
+  
+    [HttpPost]
+    [Route("payment/process")]
+    public IHttpActionResult InitiatePayment(PaymentRequestModel obj)
+    {
+        if (string.IsNullOrEmpty(obj.planid))
+        {
+            return Ok(new
+            {
+                status = 0,
+                message = "planid is required",
+                encRequest = "",
+                accessCode = "",
+                action = ""
+            });
+        }
+
+        string userid = checkvalidate_user();
+        if (string.IsNullOrEmpty(userid))
+        {
+            return Ok(new
+            {
+                status = 2,
+                message = "Access Denied.",
+                encRequest = "",
+                accessCode = "",
+                action = ""
+            });
+        }
+
+        try
+        {
+            Random rnd = new Random();
+            // Fetch plan details
+            DataTable dt = _dal.GetPlanDataByPlanId(obj.planid);
+            if (dt.Rows.Count > 0)
+            {
+                string amount = Convert.ToString(dt.Rows[0]["net_amount"]);
+                string orderid;
+                string extraData = JsonConvert.SerializeObject(new
+                {
+                    company = "Demo",
+                    totalAmount = obj.totalAmount,
+                    couponAmount = obj.couponAmount,
+                    gstAmount = obj.gstAmount,
+                    comission = obj.couponValue
+                });
+                // Ensure the order ID is unique
+                do
+                {
+                    orderid = DateTime.Now.ToString("yyyyMMddHHmmss") + rnd.Next(1, 13);   //Guid.NewGuid().ToString("N");
+                } while (_dal.CheckOrderId(orderid));
+
+
+                var redirectUrl = "https://mnbebook.mnbsoft.co.in/api/payment/Response";
+                ModBusiness busDetails = _dal.GetBusinessDetails(Convert.ToInt32(userid));
+                var parameters = new Dictionary<string, string>
+                {
+                    { "merchant_id", _merchantId },
+                    { "order_id", orderid },
+                    { "currency", "INR" },
+                    { "amount", obj.payableAmount },
+                    { "redirect_url", redirectUrl },
+                    { "cancel_url", redirectUrl },
+                    { "billing_name", busDetails.CompanyName },
+                    { "billing_address", busDetails.BusinessAddress },
+                    { "billing_city", busDetails.City },
+                    { "billing_state", busDetails.State },
+                    { "billing_zip", busDetails.PinCode },
+                    { "billing_country", "India" },
+                    { "billing_tel", busDetails.MobileNo },
+                    { "billing_email", busDetails.Email },
+                    { "delivery_name", busDetails.CompanyName },
+                    { "delivery_address", busDetails.BusinessAddress },
+                    { "delivery_city", busDetails.City },
+                    { "delivery_state", busDetails.State },
+                    { "delivery_zip", busDetails.PinCode },
+                    { "delivery_country", "India" },
+                    { "delivery_tel", busDetails.MobileNo },
+                    { "merchant_param1", userid},
+                    { "merchant_param2", obj.planid },
+                    { "merchant_param4", obj.couponNo },
+                    { "merchant_param5", extraData },
+                };
+
+               
+
+                var parameterString = string.Join("&", parameters.Select(p => $"{p.Key}={p.Value}"));
+                
+                CCACrypto ccaCrypto = new CCACrypto();
+                //string encryptedData = CcAvenuepayment.Encrypt(parameterString, "7EAA4EF2E0F1992BE5FE8584F0F405A9");
+                string encryptedData=ccaCrypto.Encrypt(parameterString, _workingKey);
+                string urlEncodedData = WebUtility.UrlEncode(encryptedData);
+
+                return Ok(new
+                {
+                    status = 1,
+                    message = "Payment Link Successfully Generated.",
+                    encRequest = urlEncodedData,
+                    accessCode = _accessCode,
+                    action = _checkoutUrl 
+                });
+            }
+            else
+            {
+                // Invalid plan ID
+                return Ok(new
+                {
+                    status = 0,
+                    message = "Invalid Plan Id.",
+                    encRequest = "",
+                    accessCode = "",
+                    action = ""
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            return Ok(new
+            {
+                status = 0,
+                message = "An error occurred while processing your request.",
+                encRequest = "",
+                accessCode = "",
+                action = ""
+            });
+        }
+    }
+    [HttpPost]
+    [Route("payment/Response")]
+    public async Task<IHttpActionResult> PaymentResponse(RespModel obj)
+    {
+        string workingKey = _workingKey;
+
+        CCACrypto ccaCrypto = new CCACrypto();
+        // Decrypt the response
+        var decryptedResponse = ccaCrypto.Decrypt(obj.encResp, workingKey);
+
+        // Parse the response parameters
+        var responseParams = HttpUtility.ParseQueryString(decryptedResponse);
+        string orderId = responseParams["order_id"];
+        string orderStatus = responseParams["order_status"];
+        string sendurl = "https://mparchi.com/admin/plan/renew/" + orderId;
+
+        var decryption = new CCACrypto();
+        var decryptedParameters = decryption.Decrypt(obj.encResp, _workingKey);
+
+        var keyValuePairs = decryptedParameters.Split('&');
+        var splittedKeyValuePairs = new Dictionary<string, string>();
+
+        foreach (var value in keyValuePairs)
+        {
+            var keyValuePair = value.Split('=');
+            if (keyValuePair.Length == 2)
+            {
+                splittedKeyValuePairs.Add(keyValuePair[0], keyValuePair[1]);
+            }
+        }
+        ModAddCCTransaction tran = new ModAddCCTransaction
+        {
+            //regno = userid,
+            regno = splittedKeyValuePairs.ContainsKey("merchant_param1") ? splittedKeyValuePairs["merchant_param1"] : null,
+            refno = splittedKeyValuePairs.ContainsKey("bank_ref_no") ? splittedKeyValuePairs["bank_ref_no"] : null,
+            tracking_id = splittedKeyValuePairs.ContainsKey("tracking_id") ? splittedKeyValuePairs["tracking_id"] : null,
+            order_id = splittedKeyValuePairs.ContainsKey("order_id") ? splittedKeyValuePairs["order_id"] : null,
+            amount = splittedKeyValuePairs.ContainsKey("amount") ? Convert.ToDecimal(splittedKeyValuePairs["amount"]) : 0,
+            payment_mode = splittedKeyValuePairs.ContainsKey("payment_mode") ? splittedKeyValuePairs["payment_mode"] : null,
+            card_name = splittedKeyValuePairs.ContainsKey("card_name") ? splittedKeyValuePairs["card_name"] : null,
+            currency = splittedKeyValuePairs.ContainsKey("currency") ? splittedKeyValuePairs["currency"] : null,
+            total_amt = splittedKeyValuePairs.ContainsKey("amount") ? Convert.ToDecimal(splittedKeyValuePairs["amount"]) : 0,
+            discount_amt = 0,
+            name = splittedKeyValuePairs.ContainsKey("billing_name") ? splittedKeyValuePairs["billing_name"] : null,
+            address = splittedKeyValuePairs.ContainsKey("billing_address") ? splittedKeyValuePairs["billing_address"] : null,
+            city = splittedKeyValuePairs.ContainsKey("billing_city") ? splittedKeyValuePairs["billing_city"] : null,
+            state = splittedKeyValuePairs.ContainsKey("billing_state") ? splittedKeyValuePairs["billing_state"] : null,
+            country = splittedKeyValuePairs.ContainsKey("billing_country") ? splittedKeyValuePairs["billing_country"] : null,
+            pincode = splittedKeyValuePairs.ContainsKey("billing_zip") ? splittedKeyValuePairs["billing_zip"] : null,
+            phone = splittedKeyValuePairs.ContainsKey("billing_tel") ? splittedKeyValuePairs["billing_tel"] : null,
+            email = splittedKeyValuePairs.ContainsKey("billing_email") ? splittedKeyValuePairs["billing_email"] : null,
+            trans_date = splittedKeyValuePairs.ContainsKey("trans_date") ? splittedKeyValuePairs["trans_date"] : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            plan_id = splittedKeyValuePairs.ContainsKey("merchant_param2") ? splittedKeyValuePairs["merchant_param2"] : null,
+            plan_name = "",
+            price = splittedKeyValuePairs.ContainsKey("amount") ? splittedKeyValuePairs["amount"] : null,
+            content = $"Transaction for Plan ID {splittedKeyValuePairs["merchant_param2"]} completed successfully.",
+            order_status = splittedKeyValuePairs.ContainsKey("order_status") ? splittedKeyValuePairs["order_status"] : "Pending",
+            jresponse = decryptedParameters,
+            status = 1,
+            couponNo = splittedKeyValuePairs.ContainsKey("merchant_param4") ? splittedKeyValuePairs["merchant_param4"] : null,
+            extraData = splittedKeyValuePairs.ContainsKey("merchant_param5") ? splittedKeyValuePairs["merchant_param5"] : null,
+        };
+        DataTable dt = new DataTable();
+        dt = _dal.GetPlanDataByPlanId(tran.plan_id);
+        if (dt.Rows.Count > 0)
+        {
+            tran.plan_name = Convert.ToString(dt.Rows[0]["plan_name"]);
+        }
+        if (_dal.CheckOrderId(tran.order_id))
+        {
+        }
+        else
+        {
+            _dal.addTransaction(tran);
+        }
+        if (tran.order_status == "Success")
+        {
+            if (!string.IsNullOrEmpty(tran.extraData))
+            {
+                try
+                {
+                    dynamic extraDataObj = JsonConvert.DeserializeObject<dynamic>(tran.extraData);
+
+                    tran.company = (string)extraDataObj?.company;
+                    tran.totalAmount = Convert.ToDecimal((string)extraDataObj?.totalAmount ?? "0");
+                    tran.gstAmount = Convert.ToDecimal((string)extraDataObj?.gstAmount ?? "0");
+                    tran.couponAmount = Convert.ToDecimal((string)extraDataObj?.couponAmount ?? "0");
+                    tran.comission = Convert.ToDecimal((string)extraDataObj?.comission ?? "0");
+                }
+                catch (Exception ex)
+                {
+                    // Optional: log ex.Message
+                }
+            }
+            if (!string.IsNullOrEmpty(tran.couponNo) && (tran.couponNo.StartsWith("MNB", StringComparison.OrdinalIgnoreCase) ||
+                tran.couponNo.StartsWith("MNBAF", StringComparison.OrdinalIgnoreCase)))
+            {
+                
+                SaleRequestModel model = new SaleRequestModel();
+                model.email = tran.email;
+                model.company = tran.name;
+                model.planName = "";
+                model.productName = "Mparchi";
+                model.mobile = tran.phone;
+                model.amount = tran.amount.ToString();
+                model.totalAmount = tran.totalAmount.ToString();
+                model.discountAmount = tran.couponAmount.ToString();
+                model.gstAmount = tran.gstAmount.ToString();
+                model.serverName = "";
+                model.planType = "";
+                model.partnerCode = tran.couponNo;
+                model.config = "";
+                model.remarks = "";
+                model.noOfUser = 0;
+                model.comission = tran.comission.ToString();
+                _dal.SendSaleRequest(model);
+            }
+            ApplyCouponRequest request = new ApplyCouponRequest();
+            request.OrderID = tran.order_id;
+            request.CouponCode = tran.couponNo;
+            request.Subtotal = tran.couponAmount;
+            await _dal.ApplyCouponAsync(request, tran.regno);
+        }
+        return Redirect(sendurl);
+    }
+    [Route("paymentstatus")]
+    [HttpGet]
+    public CommonResponse getPaymentst(string orderid)
+    {
+        DataTable dt1 = new DataTable();
+        CommonResponse comm = new CommonResponse();
+        try
+        {
+            dt1 = _dal.Getpaymentdet(orderid);
+            if (dt1 != null && dt1.Rows.Count > 0)
+            {
+                comm.Status = 1;
+                comm.Data = dt1;
+                comm.Message = "Details Fetch Successfully";
+            }
+            else
+            {
+                comm.Status = 0;
+                comm.Data = dt1;
+                comm.Message = "Details Not Fetch";
+            }
+        }
+        catch (Exception)
+        {
+            comm.Status = 0;
+            comm.Data = dt1;
+            comm.Message = "Something went wrong, Please try again...!";
+        }
+        return comm;
+    }
+    private string BuildCcAvenueRequestParameters(string orderId, string amount, string userid, string planid)
+    {
+        ModBusiness busDetails = _dal.GetBusinessDetails(Convert.ToInt32(userid));
+        string currency = "INR";
+        Random rd = new Random();
+        var queryParameters = new Dictionary<string, string>
+        {
+            { "merchant_id", _merchantId },
+            { "order_id", orderId },
+            { "currency", currency },
+            { "amount", amount },
+            { "redirect_url", $"https://mparchi.com/admin/plan/payment/{orderId}" },
+            { "cancel_url", $"https://mparchi.com/admin/plan/payment/{orderId}" },
+            { "language", "EN" },
+            { "billing_name", busDetails.CompanyName },
+            { "billing_address", busDetails.BusinessAddress },
+            { "billing_city", busDetails.City },
+            { "billing_state", busDetails.State },
+            { "billing_zip", busDetails.PinCode },
+            { "billing_country", "India" },
+            { "billing_tel", busDetails.MobileNo },
+            { "billing_email", busDetails.Email },
+            { "delivery_name", busDetails.CompanyName },
+            { "delivery_address", busDetails.BusinessAddress },
+            { "delivery_city", busDetails.City },
+            { "delivery_state", busDetails.State },
+            { "delivery_zip", busDetails.PinCode },
+            { "delivery_country", "India" },
+            { "delivery_tel", busDetails.MobileNo },
+            { "merchant_param1", planid },
+            { "merchant_param2", "" },
+            { "promo_code", "" },
+            { "customer_identifier", busDetails.Signature },
+            { "tid",  rd.Next(100000,999999).ToString()}
+        };
+        return string.Join("&", queryParameters.Select(item => $"{item.Key}={item.Value}"));
+    }
+    [HttpPost]
+    [Route("payment/success")]
+    public IHttpActionResult PaymentSuccessful(RespModel obj)
+    {
+        if (string.IsNullOrEmpty(obj.encResp))
+        {
+            var response1 = new
+            {
+                status = 0,
+                message = "Encrypted response is required.",
+                data = ""
+            };
+            return Ok(response1);
+        }
+        string userid = checkvalidate_user();
+        if (string.IsNullOrEmpty(userid))
+        {
+            var response1 = new
+            {
+                status = 2,
+                message = "Access Denied",
+                data = ""
+            };
+            return Ok(response1);
+        }
+        var decryption = new CCACrypto();
+        var decryptedParameters = decryption.Decrypt(obj.encResp, _workingKey);
+
+        var keyValuePairs = decryptedParameters.Split('&');
+        var splittedKeyValuePairs = new Dictionary<string, string>();
+
+        foreach (var value in keyValuePairs)
+        {
+            var keyValuePair = value.Split('=');
+            if (keyValuePair.Length == 2)
+            {
+                splittedKeyValuePairs.Add(keyValuePair[0], keyValuePair[1]);
+            }
+        }
+        ModAddCCTransaction tran = new ModAddCCTransaction
+        {
+            regno = userid,
+            refno = splittedKeyValuePairs.ContainsKey("refno") ? splittedKeyValuePairs["refno"] : null,
+            tracking_id = splittedKeyValuePairs.ContainsKey("tracking_id") ? splittedKeyValuePairs["tracking_id"] : null,
+            order_id = splittedKeyValuePairs.ContainsKey("order_id") ? splittedKeyValuePairs["order_id"] : null,
+            amount = splittedKeyValuePairs.ContainsKey("amount") ? Convert.ToDecimal(splittedKeyValuePairs["amount"]) : 0,
+            payment_mode = splittedKeyValuePairs.ContainsKey("payment_mode") ? splittedKeyValuePairs["payment_mode"] : null,
+            card_name = splittedKeyValuePairs.ContainsKey("card_name") ? splittedKeyValuePairs["card_name"] : null,
+            currency = splittedKeyValuePairs.ContainsKey("currency") ? splittedKeyValuePairs["currency"] : null,
+            total_amt = splittedKeyValuePairs.ContainsKey("amount") ? Convert.ToDecimal(splittedKeyValuePairs["amount"]) : 0,
+            discount_amt = 0,
+            name = splittedKeyValuePairs.ContainsKey("billing_name") ? splittedKeyValuePairs["billing_name"] : null,
+            address = splittedKeyValuePairs.ContainsKey("billing_address") ? splittedKeyValuePairs["billing_address"] : null,
+            city = splittedKeyValuePairs.ContainsKey("billing_city") ? splittedKeyValuePairs["billing_city"] : null,
+            state = splittedKeyValuePairs.ContainsKey("billing_state") ? splittedKeyValuePairs["billing_state"] : null,
+            country = splittedKeyValuePairs.ContainsKey("billing_country") ? splittedKeyValuePairs["billing_country"] : null,
+            pincode = splittedKeyValuePairs.ContainsKey("billing_zip") ? splittedKeyValuePairs["billing_zip"] : null,
+            phone = splittedKeyValuePairs.ContainsKey("billing_tel") ? splittedKeyValuePairs["billing_tel"] : null,
+            email = splittedKeyValuePairs.ContainsKey("billing_email") ? splittedKeyValuePairs["billing_email"] : null,
+            trans_date = splittedKeyValuePairs.ContainsKey("trans_date") ? splittedKeyValuePairs["trans_date"] : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            plan_id = splittedKeyValuePairs.ContainsKey("merchant_param1") ? splittedKeyValuePairs["merchant_param1"] : null,
+            plan_name = "",
+            price = splittedKeyValuePairs.ContainsKey("amount") ? splittedKeyValuePairs["amount"] : null,
+            content = $"Transaction for Plan ID {splittedKeyValuePairs["merchant_param1"]} completed successfully.",
+            order_status = splittedKeyValuePairs.ContainsKey("order_status") ? splittedKeyValuePairs["order_status"] : "Pending",
+            jresponse = decryptedParameters,
+            status = 1,
+        };
+        DataTable dt = new DataTable();
+        dt = _dal.GetPlanDataByPlanId(tran.plan_id);
+        if (dt.Rows.Count > 0)
+        {
+            tran.plan_name = Convert.ToString(dt.Rows[0]["plan_name"]);
+        }
+        if (_dal.CheckOrderId(tran.order_id))
+        {
+        }
+        else
+        {
+            _dal.addTransaction(tran);
+        }
+        var response = new
+        {
+            status = 1,
+            message = "Transaction successful",
+            data = splittedKeyValuePairs
+        };
+        return Ok(response);
+    }
+    [HttpPost]
+    [Route("payment/cancel")]
+    public IHttpActionResult PaymentCancelled()
+    {
+        return Ok(new { Message = "Payment was cancelled." });
+    }
+    [HttpGet]
+    [Route("payment/GetCCAvenueTransactionReport")]
+    public async Task<IHttpActionResult> GetCCAvenueTransactionReport()
+    {
+        try
+        {
+            string userid = checkvalidate_user();
+            if (string.IsNullOrEmpty(userid))
+            {
+                return Unauthorized();
+               
+            }
+            var result = await _dal.GetCCAvenueTransactionReportAsync(userid);
+
+            if (result == null || !result.Any())
+            {
+                return NotFound(); // HTTP 404 if no data found
+            }
+
+            return Ok(result); // HTTP 200 with data
+        }
+        catch (Exception ex)
+        {
+            // Log exception here if needed
+            return InternalServerError(ex); // HTTP 500
+        }
+    }
+    [HttpGet]
+    [Route("payment/GetCCAvenueTransactionDetail")]
+    public async Task<IHttpActionResult> GetCCAvenueTransactionDetail(int id)
+    {
+        try
+        {
+            string userid = checkvalidate_user();
+            if (string.IsNullOrEmpty(userid))
+            {
+                return Unauthorized();
+
+            }
+            var result = await _dal.GetCCAvenueTransactionDetailAsync(userid, id);
+
+            if (result == null)
+            {
+                return NotFound(); // 404 if no record found
+            }
+
+            return Ok(result); // 200 with single record
+        }
+        catch (Exception ex)
+        {
+            // Optionally log the exception
+            return InternalServerError(ex); // 500 Internal Server Error
+        }
+    }
+}
+
+---------------------------Token------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Web;
+using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
+using System.Data.SqlClient;
+using System.Data;
+using System.Drawing;
+using Newtonsoft.Json;
+using MnbebookApi.Classfile;
+
+namespace MnbebookApi.ClassFiles
+{
+
+    public class TokenManager
+    {
+        private static string Secret = "ERMN05OPLoDvbTTa/QkqLNMI7cPLguaRyHdgfsxaszzyg7n5qNBVjQmtBhz4SzYh4NBVCXi3KJHlSXKP+dasdaoi2+bXr6CUYTR==";
+        public static string GenerateToken(string username)
+        {
+            byte[] key = Convert.FromBase64String(Secret);
+            SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] {
+                      new Claim(ClaimTypes.Name, username)}),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
+            return handler.WriteToken(token);
+        }
+        public static ClaimsPrincipal GetPrincipal(string token)
+        {
+            try
+            {
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
+                if (jwtToken == null)
+                    return null;
+                byte[] key = Convert.FromBase64String(Secret);
+                TokenValidationParameters parameters = new TokenValidationParameters()
+                {
+                    RequireExpirationTime = false,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+                SecurityToken securityToken;
+                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, parameters, out securityToken);
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static string ValidateToken(string token)
+        {
+            string username = "";
+            ClaimsPrincipal principal = GetPrincipal(token);
+            if (principal == null)
+                return null;
+            ClaimsIdentity identity = null;
+            try
+            {
+                identity = (ClaimsIdentity)principal.Identity;
+            }
+            catch (NullReferenceException)
+            {
+                return "";
+            }
+            Claim usernameClaim = identity.FindFirst(ClaimTypes.Name);
+            username = usernameClaim.Value;
+
+            return username;
+        }
+    }
+}
+
+---------------------------------get plan----------------------
+
+public bool CheckOrderId(string orderid)
+{
+    DataTable t1 = new DataTable();
+    try
+    {
+
+        SqlCommand cmd = new SqlCommand("SP_CheckOrderID", con);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@orderid", orderid);
+        SqlDataAdapter dr = new SqlDataAdapter(cmd);
+        dr.Fill(t1);
+        if (t1.Rows.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    catch (Exception ex)
+    {
+        return false;
+    }
+}
+
+
+
+public bool addTransaction(ModAddCCTransaction reg)
+{
+    SqlCommand cmd = new SqlCommand("spAddTransaction", con);
+    cmd.CommandType = CommandType.StoredProcedure;
+    cmd.Parameters.AddWithValue("@regno", reg.regno);
+    cmd.Parameters.AddWithValue("@refno", reg.refno);
+    cmd.Parameters.AddWithValue("@tracking_id", reg.tracking_id);
+    cmd.Parameters.AddWithValue("@order_id", reg.order_id);
+    cmd.Parameters.AddWithValue("@payment_mode", reg.payment_mode);
+    cmd.Parameters.AddWithValue("@card_name", reg.card_name);
+    cmd.Parameters.AddWithValue("@currency", reg.currency);
+    cmd.Parameters.AddWithValue("@total_amt", reg.total_amt);
+    cmd.Parameters.AddWithValue("@discount_amt", reg.discount_amt);
+    cmd.Parameters.AddWithValue("@amount", reg.amount);
+    cmd.Parameters.AddWithValue("@name", reg.name);
+    cmd.Parameters.AddWithValue("@address", reg.address);
+    cmd.Parameters.AddWithValue("@city", reg.city);
+    cmd.Parameters.AddWithValue("@state", reg.state);
+    cmd.Parameters.AddWithValue("@country", reg.country);
+    cmd.Parameters.AddWithValue("@pincode", reg.pincode);
+    cmd.Parameters.AddWithValue("@phone", reg.phone);
+    cmd.Parameters.AddWithValue("@email", reg.email);
+    cmd.Parameters.AddWithValue("@trans_date", reg.trans_date);
+    cmd.Parameters.AddWithValue("@plan_id", reg.plan_id);
+    cmd.Parameters.AddWithValue("@plan_name", reg.plan_name);
+    cmd.Parameters.AddWithValue("@price", reg.price);
+    cmd.Parameters.AddWithValue("@content", reg.content);
+    cmd.Parameters.AddWithValue("@order_status", reg.order_status);
+    cmd.Parameters.AddWithValue("@jresponse", reg.jresponse);
+    cmd.Parameters.AddWithValue("@status", reg.status);
+    cmd.Parameters.AddWithValue("@couponcode", reg.couponNo);
+    cmd.Parameters.AddWithValue("@coupondiscount", reg.couponAmount);
+    con.Open();
+    int i = cmd.ExecuteNonQuery();
+    con.Close();
+    if (i > 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
+public async Task<List<CCAvenueTransactionReport>> GetCCAvenueTransactionReportAsync(string regno)
+{
+    var reportList = new List<CCAvenueTransactionReport>();
+
+   
+    using (var cmd = new SqlCommand("GetCCAvenueTransactionReport", con))
+    {
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@Regno", regno);
+        await con.OpenAsync();
+        using (var reader = await cmd.ExecuteReaderAsync())
+        {
+            while (await reader.ReadAsync())
+            {
+                reportList.Add(new CCAvenueTransactionReport
+                {
+                    ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                    Regno = reader["Regno"]?.ToString(),
+                    RefNo = reader["RefNo"]?.ToString(),
+                    TrackingId = reader["Tracking_Id"]?.ToString(),
+                    OrderId = reader["Order_Id"]?.ToString(),
+                    PaymentMode = reader["Payment_Mode"]?.ToString(),
+                    CardName = reader["Card_Name"]?.ToString(),
+                    Currency = reader["Currency"]?.ToString(),
+                    TotalAmt = Convert.ToDecimal(reader["Total_Amt"]),
+                    DiscountAmt = Convert.ToDecimal(reader["Discount_Amt"]),
+                    Amount = Convert.ToDecimal(reader["Amount"]),
+                    Name = reader["Name"]?.ToString(),
+                    Address = reader["Address"]?.ToString(),
+                    City = reader["City"]?.ToString(),
+                    State = reader["State"]?.ToString(),
+                    Country = reader["Country"]?.ToString(),
+                    Pincode = reader["Pincode"]?.ToString(),
+                    Phone = reader["Phone"]?.ToString(),
+                    Email = reader["Email"]?.ToString(),
+                    TransDate = Convert.ToString(reader["Trans_Date"]),
+                    PlanId = Convert.ToInt32(reader["Plan_Id"]),
+                    PlanName = reader["Plan_Name"]?.ToString(),
+                    Price = Convert.ToDecimal(reader["Price"]),
+                    Content = reader["Content"]?.ToString(),
+                    OrderStatus = reader["Order_Status"]?.ToString(),
+                    Status = Convert.ToInt32(reader["Status"]),
+                    CreateAt = Convert.ToString(reader["Create_At"])
+                });
+            }
+        }
+    }
+
+    return reportList;
+}
+
+
+
+-------------------------------Model-----------------------------
+public class ModAddCCTransaction
+{
+    public string regno { get; set; }
+    public string refno { get; set; }
+    public string tracking_id { get; set; }
+    public string order_id { get; set; }
+    public string payment_mode { get; set; }
+    public string card_name { get; set; }
+    public string currency { get; set; }
+    public decimal total_amt { get; set; }
+    public decimal discount_amt { get; set; }
+    public decimal amount { get; set; }
+    public string name { get; set; }
+    public string address { get; set; }
+    public string city { get; set; }
+    public string state { get; set; }
+    public string country { get; set; }
+    public string pincode { get; set; }
+    public string phone { get; set; }
+    public string email { get; set; }
+    public string trans_date { get; set; }
+    public string plan_id { get; set; }
+    public string plan_name { get; set; }
+    public string price { get; set; }
+    public string content { get; set; }
+    public string order_status { get; set; }
+    public string jresponse { get; set; }
+    public int status { get; set; }
+    public string isBranch { get; set; }
+    public string password { get; set; }
+    public string couponNo { get; set; } = null;
+    public string extraData { get; set; } = null;
+    public decimal couponAmount { get; set; } = 0;
+    public string company { get; set; }
+    public decimal totalAmount { get; set; } = 0;
+    public decimal gstAmount { get; set; } = 0;
+    public decimal comission { get; set; } = 0;
+}
+
+---------------------Procedure----------------------
+
+CREATE proc spAddTransaction          
+    @regno varchar(100)=null,          
+    @refno varchar(300) =null,          
+ @tracking_id varchar(300)=null,          
+ @order_id varchar(300)=null,          
+ @payment_mode varchar(300)=null,          
+ @card_name varchar(300)=null,          
+ @currency varchar(300)=null,          
+ @total_amt decimal(18,2)=null,          
+ @discount_amt decimal(18,2)=null,          
+ @amount decimal(18,2)=null,          
+ @name varchar(300)=null,          
+ @address varchar(max)=null,          
+ @city varchar(300)=null,          
+ @state varchar(300)=null,          
+ @country varchar(300)=null,          
+ @pincode varchar(300)=null,          
+ @phone varchar(300)=null,          
+ @email varchar(300)=null,          
+ @trans_date varchar(300)=null,          
+ @plan_id varchar(300)=null,          
+ @plan_name varchar(300)=null,          
+ @price varchar(300)=null,          
+ @content varchar(300)=null,          
+ @order_status varchar(300)=null,          
+ @status int ,      
+ @jresponse varchar(max)=null      
+           
+as          
+begin        
+declare @NextDayID int,@duration int,@days int    
+Insert into tbl_ccavnue_transaction(regno,refno,tracking_id,order_id,payment_mode,card_name,currency,total_amt,discount_amt,amount,name,address,city,state,country,pincode,phone,email,trans_date,plan_id,plan_name,price,content,order_status,status,create_at
+  
+    
+,jresponse      
+        
+)values(@regno,@refno,@tracking_id,@order_id,@payment_mode,@card_name,@currency,@total_amt,@discount_amt,@amount,@name,@address,@city,@state,@country,@pincode,@phone,@email,@trans_date,@plan_id,@plan_name,@price,@content,@order_status, @status,GETDATE(),@
+jresponse)       
+        
+     if(@order_status='Success')    
+  select @duration=valid_for from tbl_mparchiplan where id=@plan_id  
+   set @days=365*@duration  
+update Tbl_BusinessDetails set plan_type='Paid',valid_upto=DATEADD(DAY, @days, dateadd(minute,(30),dateadd(hour,(5),getutcdate()))),join_type=@amount where UserId=@regno    
+end     
+
+
+
+Create Proc SP_CheckOrderID  
+  @orderid varchar(200)  
+  as  
+  begin  
+ select * from tbl_ccavnue_transaction where order_id=@orderid  
+  end
+
+
+-------------------------------Table------------------------------
+CREATE TABLE [dbo].[tbl_ccavnue_transaction](
+	[ID] [int] IDENTITY(1000,5) NOT NULL,
+	[regno] [varchar](100) NOT NULL,
+	[refno] [varchar](300) NULL,
+	[tracking_id] [varchar](300) NULL,
+	[order_id] [varchar](300) NULL,
+	[payment_mode] [varchar](300) NULL,
+	[card_name] [varchar](300) NULL,
+	[currency] [varchar](300) NULL,
+	[total_amt] [decimal](18, 2) NULL,
+	[discount_amt] [decimal](18, 2) NULL,
+	[amount] [decimal](18, 2) NULL,
+	[name] [varchar](300) NULL,
+	[address] [varchar](max) NULL,
+	[city] [varchar](300) NULL,
+	[state] [varchar](300) NULL,
+	[country] [varchar](300) NULL,
+	[pincode] [varchar](300) NULL,
+	[phone] [varchar](300) NULL,
+	[email] [varchar](300) NULL,
+	[trans_date] [varchar](300) NULL,
+	[plan_id] [varchar](300) NULL,
+	[plan_name] [varchar](300) NULL,
+	[price] [varchar](300) NULL,
+	[content] [varchar](300) NULL,
+	[order_status] [varchar](300) NULL,
+	[status] [int] NULL,
+	[create_at] [datetime] NULL,
+	[jresponse] [varchar](max) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)
