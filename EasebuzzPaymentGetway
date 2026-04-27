@@ -1,0 +1,379 @@
+public class PaymentRequest
+{
+    public decimal TotalAmount { get; set; }
+    public decimal PaidAmount { get; set; }
+    public string PaymentType { get; set; }
+    public string OrderId { get; set; }
+
+} 
+
+
+--------------------------Controller-------------------------
+[HttpPost("payment/initiate")]
+public async Task<IActionResult> Initiate([FromBody] PaymentRequest model)
+{
+    try
+    {
+        string token = Request.Headers["X-Auth-Token"].FirstOrDefault();
+        string regno = TokenManager.ValidateToken(token);
+
+        if (string.IsNullOrEmpty(regno))
+        {
+            return Unauthorized(new CommonResponse
+            {
+                Status = "UnAuthrized",
+                Message = "Customer unauthorized!"
+            });
+        }
+        else
+        {
+            string txnid = "TXN" + DateTime.Now.Ticks;
+            string paymentUrl = await _contract.GeneratePaymentUrl(
+                model.OrderId,
+                regno,
+                model.PaymentType,
+                model.TotalAmount,
+                model.PaidAmount,
+                model.PaidAmount,
+                txnid
+            );
+
+            return Ok(new
+            {
+                status = true,
+                message = "Payment Initiated",
+                data = new
+                {
+                    txnid,
+                    paymentUrl
+                }
+            });
+        }
+    }
+    catch (Exception ex)
+    {
+        return Ok(new
+        {
+            status = false,
+            message = ex.Message
+        });
+    }
+}
+[HttpPost("payment/success")]
+public async Task<IActionResult> PaymentSuccess([FromForm] IFormCollection form)
+{
+    try
+    {
+        string txnid = form["txnid"];
+
+        var verify = await _contract.CheckPaymentStatusFromEasebuzz(txnid);
+
+        // ✅ CHECK ROOT
+        if (verify == null || verify["msg"] == null)
+        {
+            throw new Exception("Invalid Easebuzz response");
+        }
+
+        // ✅ msg is ARRAY
+        var data = verify["data"]?[0] ?? verify["msg"]?[0];
+
+        if (data == null)
+        {
+            throw new Exception("Transaction data not found");
+        }
+
+        string status = data["status"]?.ToString();
+        string easepayid = data["easepayid"]?.ToString();
+        string amount = data["amount"]?.ToString();
+        string txn = data["txnid"]?.ToString();
+        string bankRef = data["bank_ref_num"]?.ToString();
+        string errorMsg = data["error_Message"]?.ToString();
+
+        await _contract.UpdateEasyBuzzTransaction(
+            txnid,
+            status == "success" ? "Completed" : "Failed",
+            easepayid,
+            bankRef,
+            errorMsg,
+            verify.ToString()
+        );
+
+        if (status != "success")
+        {
+            return Redirect($"https://sanatanbhakticloud.com/booking-status?txnid={txnid}");
+        }
+
+        return Redirect($"https://sanatanbhakticloud.com/booking-status?txnid={txnid}");
+    }
+    catch (Exception ex)
+    {
+        return Content("Error: " + ex.Message);
+    }
+}
+[HttpPost("payment/failure")]
+public async Task<IActionResult> PaymentFailure([FromForm] IFormCollection form)
+{
+    try
+    {
+        string txnid = form["txnid"];
+
+        var verify = await _contract.CheckPaymentStatusFromEasebuzz(txnid);
+
+        if (verify == null)
+            throw new Exception("Invalid response from Easebuzz");
+
+        // ✅ SUPPORT BOTH (v1 + v2.1)
+        var data = verify["data"]?[0] ?? verify["msg"]?[0];
+
+        if (data == null)
+            throw new Exception("Transaction data not found");
+
+        // ✅ SAFE READ
+        string status = data["status"]?.ToString();
+        string easepayid = data["easepayid"]?.ToString();
+        string bankRef = data["bank_ref_num"]?.ToString();
+        string errorMsg = data["error_Message"]?.ToString();
+
+        // ✅ STATUS MAPPING
+        string finalStatus = status switch
+        {
+            "success" => "Completed",
+            "failure" => "Failed",
+            "userCancelled" => "Cancelled",
+            _ => "Pending"
+        };
+
+        // ✅ UPDATE DB
+        await _contract.UpdateEasyBuzzTransaction(
+            txnid,
+            finalStatus,
+            easepayid,
+            bankRef,
+            errorMsg,
+            verify.ToString()
+        );
+
+        return Redirect($"https://sanatanbhakticloud.com/booking-status?txnid={txnid}");
+    }
+    catch (Exception ex)
+    {
+        return Content("Error: " + ex.Message);
+    }
+}
+[HttpGet("payment/status/{txnid}")]
+public async Task<IActionResult> CheckFromEasebuzz(string txnid)
+{
+    try
+    {
+        var verify = await _contract.CheckPaymentStatusFromEasebuzz(txnid);
+
+        if (verify == null)
+        {
+            return Ok(new
+            {
+                status = false,
+                message = "No response from Easebuzz"
+            });
+        }
+
+        // ✅ HANDLE BOTH RESPONSE TYPES (data/msg)
+        var data = verify["data"]?[0] ?? verify["msg"]?[0];
+
+        if (data == null)
+        {
+            return Ok(new
+            {
+                status = false,
+                message = "Transaction not found"
+            });
+        }
+
+        return Ok(new
+        {
+            status = true,
+            message = "Success",
+            data = data
+        });
+    }
+    catch (Exception ex)
+    {
+        return Ok(new
+        {
+            status = false,
+            message = ex.Message
+        });
+    }
+}
+
+----------------------------------Data Access-------------------------------
+
+public async Task<DataTable> GetUserData(string regno)
+{
+    DataTable dt = new DataTable();
+
+    try
+    {
+        using (var connection = new SqlConnection(_con.GetConnectionString()))
+        using (var cmd = new SqlCommand("select * from tbl_user_register where uid=@uid", connection))
+        {
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@uid", regno);
+            SqlDataAdapter sda = new SqlDataAdapter(cmd);
+            sda.Fill(dt);
+        }
+    }
+    catch (Exception ex)
+    {
+    }
+
+    return dt;
+}
+public string GenerateHash(string input)
+{
+    using var sha512 = SHA512.Create();
+    var bytes = sha512.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+    StringBuilder sb = new();
+    foreach (var b in bytes)
+        sb.Append(b.ToString("x2"));
+
+    return sb.ToString();
+}
+
+public async Task<string> GeneratePaymentUrl(string orderId,string regno,string paymentType,decimal totalAmount,decimal advanceAmount,decimal paidAmount,string txnid)
+{
+    string key = _config["Payment:Key"];
+    string salt = _config["Payment:Salt"];
+    string baseUrl = _config["Payment:BaseUrl"];
+
+    string initiateUrl = "https://testpay.easebuzz.in/payment/initiateLink";
+    string payUrl = "https://testpay.easebuzz.in/pay/";
+
+    //decimal paidAmount = paymentType == "advance" ? advanceAmount : totalAmount;
+    string amt = paidAmount.ToString("0.00");
+
+    var dt = await GetUserData(regno);
+
+    string name = dt.Rows.Count > 0 ? dt.Rows[0]["name"]?.ToString() : "Test User";
+    string email = dt.Rows.Count > 0 ? dt.Rows[0]["email"]?.ToString() : "test@gmail.com";
+    string phone = dt.Rows.Count > 0 ? dt.Rows[0]["phone"]?.ToString() : "9999999999";
+
+    string productinfo = "Booking";
+
+    string surl = $"{baseUrl}/api/payment/success";
+    string furl = $"{baseUrl}/api/payment/failure";
+
+    // ✅ UDF VALUES
+    string udf1 = orderId;
+    string udf2 = regno;
+    string udf3 = paymentType;
+    string udf4 = "Online";
+    string udf5 = amt;
+
+    // 🔥 CORRECT HASH
+    string hashString = $"{key}|{txnid}|{amt}|{productinfo}|{name}|{email}|{udf1}|{udf2}|{udf3}|{udf4}|{udf5}||||||{salt}";
+
+    string hash = GenerateHash(hashString);
+
+    var payload = new Dictionary<string, string>
+    {
+        { "key", key },
+        { "txnid", txnid },
+        { "amount", amt },
+        { "productinfo", productinfo },
+        { "firstname", name },
+        { "email", email },
+        { "phone", phone },
+        { "surl", surl },
+        { "furl", furl },
+        { "hash", hash },
+
+        { "udf1", udf1 },
+        { "udf2", udf2 },
+        { "udf3", udf3 },
+        { "udf4", udf4 },
+        { "udf5", udf5 }
+    };
+
+    using var client = new HttpClient();
+
+    var response = await client.PostAsync(initiateUrl, new FormUrlEncodedContent(payload));
+    var json = await response.Content.ReadAsStringAsync();
+
+    if (!json.TrimStart().StartsWith("{"))
+        throw new Exception("Easebuzz returned HTML → check key/salt");
+
+    dynamic result = JsonConvert.DeserializeObject(json);
+
+    if (result.status != 1)
+        throw new Exception(result.msg.ToString());
+
+    string accessKey = result.data;
+
+    // ✅ SAVE TRANSACTION
+    await InsertEasyBuzzTransaction(new EasyBuzzTransaction
+    {
+        RegNo = regno,
+        OrderId = orderId,
+        PaymentType = paymentType,
+        PaymentMode = "Online",
+        TotalAmount = totalAmount.ToString("0.00"),
+        AdvanceAmount = advanceAmount.ToString("0.00"),
+        PaidAmount = paidAmount,
+        TxnId = txnid,
+        ProductInfo = productinfo,
+        Name = name,
+        Email = email,
+        Phone = phone,
+        Surl = surl,
+        Furl = furl,
+        Hash = hash
+    });
+
+    return payUrl + accessKey;
+}
+public async Task<JObject> CheckPaymentStatusFromEasebuzz(string txnid)
+{
+    string key = _config["Payment:Key"];
+    string salt = _config["Payment:Salt"];
+
+    // 🔥 SIMPLE HASH (v2.1)
+    string hashString = $"{key}|{txnid}|{salt}";
+    string hash = GenerateHash(hashString);
+
+    Console.WriteLine("HASH STRING:");
+    Console.WriteLine(hashString);
+
+    using var client = new HttpClient();
+
+    var request = new HttpRequestMessage
+    {
+        Method = HttpMethod.Post,
+        RequestUri = new Uri("https://testdashboard.easebuzz.in/transaction/v2.1/retrieve"),
+        Headers =
+{
+    { "Accept", "application/json" }
+},
+        Content = new FormUrlEncodedContent(new Dictionary<string, string>
+{
+    { "key", key },
+    { "txnid", txnid },
+    { "hash", hash }
+})
+    };
+
+    var response = await client.SendAsync(request);
+    var body = await response.Content.ReadAsStringAsync();
+
+    Console.WriteLine("Easebuzz V2.1 Response:");
+    Console.WriteLine(body);
+
+    if (!response.IsSuccessStatusCode)
+        throw new Exception("Easebuzz API Error: " + body);
+
+    if (string.IsNullOrWhiteSpace(body) || !body.TrimStart().StartsWith("{"))
+        throw new Exception("Invalid response from Easebuzz");
+
+    return JObject.Parse(body);
+}
+
