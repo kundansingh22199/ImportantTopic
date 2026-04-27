@@ -1,0 +1,86 @@
+ "SmsSettings": {
+   "ApiKey": "VNMoCLDrizGJlcBo",
+   "SenderId": "SBC"
+ }
+
+
+
+
+[HttpPost("send-sms")]
+public async Task<IActionResult> SendSmsAsync([FromBody] SmsRequest request)
+{
+    try
+    {
+        var url = "https://msgn.mtalkz.com/api";
+
+        var otp = new Random().Next(100000, 999999);
+
+        var message = $"{otp} is the OTP to log in Sanatan Bhakti Cloud Pvt. Ltd.. This OTP is valid for 10 minutes. DO NOT SHARE WITH ANYONE.\n-Team SBC";
+
+        var payload = new
+        {
+            apikey = _configuration["SmsSettings:ApiKey"],
+            senderid = _configuration["SmsSettings:SenderId"],
+            number = request.Mobile,
+            message = message,
+            format = "json"
+        };
+
+        var json = JsonSerializer.Serialize(payload);
+
+        using var client = new HttpClient();
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await client.PostAsync(url, content);
+        var result = await response.Content.ReadAsStringAsync();
+
+        string apiStatus = "";
+        string apiMessage = "";
+        string smsStatus = "";
+
+        using (var doc = JsonDocument.Parse(result))
+        {
+            var root = doc.RootElement;
+
+            if (root.TryGetProperty("status", out var statusProp))
+                apiStatus = statusProp.GetString();
+
+            if (root.TryGetProperty("message", out var msgProp))
+                apiMessage = msgProp.GetString();
+
+            if (root.TryGetProperty("data", out var dataProp) &&
+                dataProp.ValueKind == JsonValueKind.Array &&
+                dataProp.GetArrayLength() > 0)
+            {
+                var first = dataProp[0];
+
+                if (first.TryGetProperty("status", out var smsProp))
+                    smsStatus = smsProp.GetString();
+            }
+        }
+
+        if (apiStatus == "OK" && smsStatus == "SUBMITTED")
+        {
+            if(await _contract.AddSmsOtp(request.Mobile, Convert.ToString(otp)))
+            return Ok(new
+            {
+                success = true,
+                message = "OTP sent successfully ✅"
+            });
+        }
+
+        return BadRequest(new
+        {
+            success = false,
+            message = string.IsNullOrEmpty(apiMessage) ? "SMS sending failed ❌" : apiMessage
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new
+        {
+            success = false,
+            message = ex.Message 
+        });
+    }
+}
