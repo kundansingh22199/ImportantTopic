@@ -6,7 +6,13 @@ public class PaymentRequest
     public string OrderId { get; set; }
 
 } 
-
+---------------------------------------------------------
+ "Payment": {
+   "Key": "1PWOORY0W",
+   "Salt": "TL91PLARW",
+   "BaseUrl": "https://apijaishreeshyam.mnbsoft.co.in",
+   "InitiateUrl": "https://testpay.easebuzz.in/payment/initiate"
+ }
 
 --------------------------Controller-------------------------
 [HttpPost("payment/initiate")]
