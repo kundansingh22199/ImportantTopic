@@ -1,0 +1,168 @@
+"Razorpay": {
+  "Key": "rzp_live_SYyEFnu7duvihR",
+  "Secret": "SR2HtWhzXtRvaWhSoN960TIh",
+  "RedirectUrl": "https://nv.mnbsoft.in/api/razorpay/response"
+}
+
+----------------------------------------------------------------------------------------------
+[ApiController]
+[Route("api/razorpay")]
+[EnableCors("*")]
+public class RazorpayController : ControllerBase
+{
+    private readonly IContract _icontract;
+    private readonly IContractList _contractList;
+    private readonly IConfiguration _config;
+    public RazorpayController(IContract contract, IConfiguration config, IContractList contractList)
+    {
+        _icontract = contract;
+        _config = config;
+        _contractList = contractList;
+    }
+
+    // ✅ TOKEN VALIDATION
+    public string CheckValidateUser()
+    {
+        var headers = Request.Headers;
+
+        if (headers.ContainsKey("X-Auth-Token"))
+        {
+            string token = headers["X-Auth-Token"].FirstOrDefault();
+            if (!string.IsNullOrEmpty(token))
+            {
+                return TokenManager.ValidateToken(token);
+            }
+        }
+
+        return "";
+    }
+
+    [HttpPost("create-payment")]
+    public async Task<IActionResult> CreatePayment(ModAmt obj)
+    {
+        try
+        {
+            string uid = CheckValidateUser();
+            if (string.IsNullOrEmpty(uid))
+                return Unauthorized("Access Denied");
+
+            ModUserDetails objdata = new ModUserDetails();
+            objdata = _contractList.UserDetails(uid);
+
+            decimal amount = (obj.quantity * obj.value);
+            amount += (amount * 2 / 100);
+
+            var client = new RazorpayClient(
+                _config["Razorpay:Key"],
+                _config["Razorpay:Secret"]
+            );
+
+            long expireBy = DateTimeOffset.UtcNow.AddMinutes(20).ToUnixTimeSeconds();
+
+            var options = new Dictionary<string, object>
+            {
+                { "amount", (long)(amount * 100) },
+                { "currency", "INR" },
+                { "description", "Payment" },
+                { "expire_by", expireBy },
+
+                { "customer", new Dictionary<string, object>
+                    {
+                        { "name", objdata.name},
+                        { "email", objdata.email },
+                        { "contact", objdata.mobileNo }
+                    }
+                },
+
+                { "notify", new Dictionary<string, object>
+                    {
+                        { "sms", true },
+                        { "email", true }
+                    }
+                },
+
+                { "callback_url", $"{_config["Razorpay:RedirectUrl"]}?uid={uid}" },
+                { "callback_method", "get" }
+            };
+
+            var paymentLink = client.PaymentLink.Create(options);
+
+            await _icontract.PhonePayTransaction(new ModPhonePay
+            {
+                RegNo = uid,
+                Quantity = obj.quantity,
+                PinValue = obj.value,
+                TotalValue = obj.quantity * obj.value,
+                PayableAmount = amount,
+                MerchantOrderId = paymentLink["id"].ToString(),
+                Status = "CREATED",
+                Action = "insert"
+            });
+
+            return Ok(new
+            {
+                status = "success",
+                paymentUrl = paymentLink["short_url"],
+                linkId = paymentLink["id"]
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { status = "error", message = ex.Message });
+        }
+    }
+
+    // ✅ CALLBACK (VERY IMPORTANT)
+    [HttpGet("response")]
+    public async Task<IActionResult> PaymentResponse(
+        string razorpay_payment_id,
+        string razorpay_payment_link_id,
+        string uid)
+    {
+        var client = new RazorpayClient(
+            _config["Razorpay:Key"],
+            _config["Razorpay:Secret"]
+        );
+
+        var payment = client.Payment.Fetch(razorpay_payment_id);
+        string status = payment["status"];
+
+        await _icontract.PhonePayTransaction(new ModPhonePay
+        {
+            RegNo = uid,
+            MerchantOrderId = razorpay_payment_link_id,
+            TransactionId = razorpay_payment_id,
+            Status = status == "captured" ? "COMPLETED" : "FAILED",
+            PayableAmount = payment["amount"] / 100m,
+            Response = payment.Attributes.ToString(),
+            Action = "update"
+        });
+
+        return Redirect($"https://nvshoppe.com/user/paymet/{razorpay_payment_link_id}");
+    }
+
+    // ✅ STATUS API
+    [HttpGet("status/{linkId}")]
+    public IActionResult CheckStatus(string linkId)
+    {
+        var client = new RazorpayClient(
+            _config["Razorpay:Key"],
+            _config["Razorpay:Secret"]
+        );
+
+        var link = client.PaymentLink.Fetch(linkId);
+
+        string paymentId = null;
+        if (link["payments"] != null && link["payments"].HasValues)
+        {
+            paymentId = link["payments"][0]["payment_id"]?.ToString();
+        }
+
+        return Ok(new
+        {
+            status = link["status"],
+            paymentId,
+            amount = link["amount"] / 100m
+        });
+    }
+}
